@@ -8,6 +8,7 @@
     },
     "component-class-suffix": true,
     "contextual-lifecycle": true,
+    "curly": false,
     "directive-class-suffix": true,
     "directive-selector": [
       true,
@@ -83,7 +84,8 @@
     "template-banana-in-box": true,
     "template-no-negated-async": true,
     "use-lifecycle-interface": true,
-    "use-pipe-transform-interface": true
+    "use-pipe-transform-interface": true,
+    "completed-docs": true
   },
   "rulesDirectory": [
     "codelyzer"
