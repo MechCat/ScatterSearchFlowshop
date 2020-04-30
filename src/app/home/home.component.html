@@ -1,3 +1,9 @@
 <div class="component-container">
-    <p>home works!</p>
+    <mat-select [(value)]="ps.problem.Name" (selectionChange)="selectProblem()" placeholder="Problemler"
+        class="problem-selector">
+        <mat-option *ngFor="let p of problemList" [value]="p">
+            {{p}}
+        </mat-option>
+    </mat-select>
+    <button mat-raised-button (click)="test()">TEST</button>
 </div>
