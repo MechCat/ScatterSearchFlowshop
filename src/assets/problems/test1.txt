@@ -1,3 +1,6 @@
-4 5 10
-2 8 12
-15 6 2
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          3           3   0        100        100
+processing times :
+5 8 4
+5 3 5
+3 3 2

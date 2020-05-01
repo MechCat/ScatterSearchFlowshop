@@ -22,11 +22,10 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  resetProblem() { }
-
+  /** Parses data from the selected problem text file */
   selectProblem() {
-    console.log(this.ps.problem.Name);
-    let a = this.ps.readProblem(this.ps.problem.Name).subscribe(x => {
+    console.log('Selected problem:', this.ps.problem.Name);
+    this.ps.readProblem(this.ps.problem.Name).subscribe(x => {
       console.log(x);
       this.ps.parseProblem(x);
     });
@@ -36,7 +35,11 @@ export class HomeComponent implements OnInit {
 
   /** General testing function */
   test() {
-    alert('success!');
+    // alert('success!');
+    console.log('func test');
+    const seq = [1, 2, 0];
+    const makespan = this.ps.evaluateSolution(seq);
+    console.log('seq:', seq, 'makespan: ', makespan);
   }
 
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Solution } from '../shared/models';
 
 /** ProblemService */
 @Injectable({
@@ -12,7 +13,6 @@ export class ProblemService {
   problem: Problem = {
     BoundLower: undefined,
     BoundUpper: undefined,
-    Makespan: undefined,
     NumberOfMachines: 0,
     NumberOfJobs: 0,
     Name: '',
@@ -24,9 +24,44 @@ export class ProblemService {
   /**
    * Calculates solution makespan.
    * @param sequence Solution sequence of jobs
+   * @return Makespan of given solution
    */
-  evaluateSolution(sequence: number[]) {
-    this.problem.Makespan = Number.MAX_VALUE; // placeholder***
+  evaluateSolution(sequence: number[]): number {
+    const sol = new Solution(sequence);
+
+    for (let i = 0; i < this.problem.NumberOfMachines; i++) {
+      const startTimesOfCurrentMachine = [];
+      const endTimesOfCurrentMachine = [];
+
+      if (i === 0) {  // 1st machine
+        let jobStart = 0;
+        for (let j = 0; j < this.problem.NumberOfJobs; j++) {
+          const jobEnd = jobStart + this.problem.ProcessingTimes[0][sequence[j]]; // prep. & cleaning times here if needed
+          jobStart = jobEnd;
+          startTimesOfCurrentMachine.push(jobStart);
+          endTimesOfCurrentMachine.push(jobEnd);
+        }
+      } else { // other machines
+        for (let j = 0; j < this.problem.NumberOfJobs; j++) {
+          let jobStart;
+          const endOfPrevMachine = sol.TimeEnds[i - 1][j];
+          const endOfPrevJob = (endTimesOfCurrentMachine[j - 1] !== undefined) ? endTimesOfCurrentMachine[j - 1] : 0;
+
+          if (endOfPrevJob > endOfPrevMachine)
+            jobStart = endOfPrevJob;
+          else
+            jobStart = endOfPrevMachine;
+          const jobEnd = jobStart + this.problem.ProcessingTimes[i][sequence[j]];  // prep. & cleaning times here if needed
+
+          startTimesOfCurrentMachine.push(jobStart);
+          endTimesOfCurrentMachine.push(jobEnd);
+        }
+      }
+      sol.TimeStarts.push(startTimesOfCurrentMachine);
+      sol.TimeEnds.push(endTimesOfCurrentMachine);
+    }
+    console.log('solution:', sol);
+    return sol.TimeEnds[this.problem.NumberOfMachines - 1][this.problem.NumberOfJobs - 1];
   }
 
   /** Reads the problem names listed in assets...problems.json */
@@ -60,9 +95,8 @@ export class ProblemService {
 
     for (let i = 3; i < rows.length; i++) { // starting from the rows[3] where processing times are
       const tempArr = rows[i].match(/[0-9]+/g);
-      this.problem.ProcessingTimes.push(tempArr);
+      this.problem.ProcessingTimes.push(tempArr.map(x => Number(x)));
     }
-    this.problem.Makespan = Number.MAX_VALUE;
     console.log(this.problem);
   }
 
@@ -78,7 +112,6 @@ export class ProblemService {
   resetProblem() {
     this.problem.BoundUpper = undefined;
     this.problem.BoundLower = undefined;
-    this.problem.Makespan = undefined;
     this.problem.Name = '';
     this.problem.NumberOfJobs = 0;
     this.problem.NumberOfMachines = 0;
@@ -91,8 +124,6 @@ export interface Problem {
   BoundLower: number;
   /** Upper bound of the optimal makespans (best value E. Taillard's gotten) */
   BoundUpper: number;
-  /** Total makespan of problem */
-  Makespan: number;
   /** Problem name */
   Name: string;
   /** Number of jobs */
