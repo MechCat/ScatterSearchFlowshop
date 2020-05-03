@@ -1,9 +1,21 @@
 <div class="component-container">
-    <mat-select [(value)]="ps.problem.Name" (selectionChange)="selectProblem()" placeholder="Problemler"
-        class="problem-selector">
-        <mat-option *ngFor="let p of problemList" [value]="p">
-            {{p}}
-        </mat-option>
-    </mat-select>
-    <button mat-raised-button (click)="test()">TEST</button>
+    <!-- Controls -->
+    <div class="control-panel">
+        <mat-select [(value)]="ps.problem.Name" (selectionChange)="selectProblem()" placeholder="Problemler"
+            class="problem-selector">
+            <mat-option *ngFor="let p of problemList" [value]="p">
+                {{p}}
+            </mat-option>
+        </mat-select>
+        <button mat-raised-button (click)="test()">TEST</button>
+        <mat-form-field>
+            <input matInput readonly [(value)]="seqLabel">
+        </mat-form-field>
+        <button mat-raised-button (click)="testRandomize()">Randomize sequence</button>
+    </div>
+    <!-- Canvas -->
+    <div class="canvas-panel">
+        <canvas #layer1 class="graph"></canvas>
+        <canvas #layer2 class="graph"></canvas>
+    </div>
 </div>

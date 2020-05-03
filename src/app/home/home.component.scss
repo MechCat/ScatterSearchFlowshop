@@ -1,5 +1,17 @@
+.canvas-panel {
+    background-color: beige;
+    width: 100%;
+}
+
 .component-container {
     justify-content: center;
+    display: grid;
+    grid-template-rows: 4em auto;
+}
+
+.control-panel {
+    background-color: cadetblue;
+    width: 100%;
 }
 
 .problem-selector {
