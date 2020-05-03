@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Solution } from '../shared/models';
+import { Solution, Job } from '../shared/models';
 
 /** ProblemService */
 @Injectable({
@@ -30,38 +30,38 @@ export class ProblemService {
     const sol = new Solution(sequence);
 
     for (let i = 0; i < this.problem.NumberOfMachines; i++) {
-      const startTimesOfCurrentMachine = [];
-      const endTimesOfCurrentMachine = [];
+      const jobsOfCurrentMachine: Job[] = [];
 
       if (i === 0) {  // 1st machine
         let jobStart = 0;
         for (let j = 0; j < this.problem.NumberOfJobs; j++) {
           const jobEnd = jobStart + this.problem.ProcessingTimes[0][sequence[j]]; // prep. & cleaning times here if needed
           jobStart = jobEnd;
-          startTimesOfCurrentMachine.push(jobStart);
-          endTimesOfCurrentMachine.push(jobEnd);
+
+          const job: Job = { Start: jobStart, End: jobEnd, ProcessTime: this.problem.ProcessingTimes[0][sequence[j]], Name: sequence[j] };
+          jobsOfCurrentMachine.push(job);
         }
       } else { // other machines
         for (let j = 0; j < this.problem.NumberOfJobs; j++) {
           let jobStart;
-          const endOfPrevMachine = sol.TimeEnds[i - 1][j];
-          const endOfPrevJob = (endTimesOfCurrentMachine[j - 1] !== undefined) ? endTimesOfCurrentMachine[j - 1] : 0;
+          const endOfPrevMachine = sol.Jobs[i - 1][j].End;
+          const endOfPrevJob = (jobsOfCurrentMachine[j - 1] !== undefined) ? jobsOfCurrentMachine[j - 1].End : 0;
 
           if (endOfPrevJob > endOfPrevMachine)
             jobStart = endOfPrevJob;
           else
             jobStart = endOfPrevMachine;
-          const jobEnd = jobStart + this.problem.ProcessingTimes[i][sequence[j]];  // prep. & cleaning times here if needed
 
-          startTimesOfCurrentMachine.push(jobStart);
-          endTimesOfCurrentMachine.push(jobEnd);
+          const jobEnd = jobStart + this.problem.ProcessingTimes[i][sequence[j]];  // prep. & cleaning times here if needed
+          const job: Job = { Start: jobStart, End: jobEnd, ProcessTime: this.problem.ProcessingTimes[i][sequence[j]], Name: sequence[j] };
+          jobsOfCurrentMachine.push(job);
         }
       }
-      sol.TimeStarts.push(startTimesOfCurrentMachine);
-      sol.TimeEnds.push(endTimesOfCurrentMachine);
+      sol.Jobs.push(jobsOfCurrentMachine);
     }
+    sol.Makespan = sol.Jobs[this.problem.NumberOfMachines - 1][this.problem.NumberOfJobs - 1].End;
     console.log('solution:', sol);
-    return sol.TimeEnds[this.problem.NumberOfMachines - 1][this.problem.NumberOfJobs - 1];
+    return sol.Makespan;
   }
 
   /** Reads the problem names listed in assets...problems.json */
@@ -119,7 +119,8 @@ export class ProblemService {
   }
 }
 
-export interface Problem {
+
+export interface Problem {  // Refactor as Flowshop?
   /** Lower bound of the makespans */
   BoundLower: number;
   /** Upper bound of the optimal makespans (best value E. Taillard's gotten) */
