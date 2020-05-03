@@ -36,10 +36,9 @@ export class ProblemService {
         let jobStart = 0;
         for (let j = 0; j < this.problem.NumberOfJobs; j++) {
           const jobEnd = jobStart + this.problem.ProcessingTimes[0][sequence[j]]; // prep. & cleaning times here if needed
-          jobStart = jobEnd;
-
           const job: Job = { Start: jobStart, End: jobEnd, ProcessTime: this.problem.ProcessingTimes[0][sequence[j]], Name: sequence[j] };
           jobsOfCurrentMachine.push(job);
+          jobStart = jobEnd;
         }
       } else { // other machines
         for (let j = 0; j < this.problem.NumberOfJobs; j++) {
