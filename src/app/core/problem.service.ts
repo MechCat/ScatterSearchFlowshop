@@ -26,7 +26,7 @@ export class ProblemService {
    * @param sequence Solution sequence of jobs
    * @return Makespan of given solution
    */
-  evaluateSolution(sequence: number[]): number {
+  evaluateSolution(sequence: number[]): Solution {
     const sol = new Solution(sequence);
 
     for (let i = 0; i < this.problem.NumberOfMachines; i++) {
@@ -60,7 +60,7 @@ export class ProblemService {
     }
     sol.Makespan = sol.Jobs[this.problem.NumberOfMachines - 1][this.problem.NumberOfJobs - 1].End;
     console.log('solution:', sol);
-    return sol.Makespan;
+    return sol;
   }
 
   /** Reads the problem names listed in assets...problems.json */

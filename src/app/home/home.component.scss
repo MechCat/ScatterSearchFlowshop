@@ -1,6 +1,13 @@
 .canvas-panel {
-    background-color: beige;
     width: 100%;
+    position: relative;
+}
+
+.canvas {
+    border: 1px solid black;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .component-container {
@@ -10,7 +17,7 @@
 }
 
 .control-panel {
-    background-color: cadetblue;
+    background-color: darkkhaki;
     width: 100%;
 }
 

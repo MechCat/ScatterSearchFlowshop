@@ -36,12 +36,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   /** Size canvas' after view inits */
   ngAfterViewInit(): void {
+    this.prepareCanvas();
+  }
+
+  /** Prepares canvas' dimensions */
+  prepareCanvas() {
     this.cs.layer1 = (this.canvasElem.nativeElement as HTMLCanvasElement).getContext('2d');
-    this.cs.layer1.canvas.height = this.cs.canvasSize;
-    this.cs.layer1.canvas.width = this.cs.canvasSize;
+    this.cs.layer1.canvas.height = this.cs.canvasHeight;
+    this.cs.layer1.canvas.width = this.cs.canvasWidth;
     this.cs.layer2 = (this.canvasElem2.nativeElement as HTMLCanvasElement).getContext('2d');
-    this.cs.layer2.canvas.height = this.cs.canvasSize;
-    this.cs.layer2.canvas.width = this.cs.canvasSize;
+    this.cs.layer2.canvas.height = this.cs.canvasHeight;
+    this.cs.layer2.canvas.width = this.cs.canvasWidth;
   }
 
   /** Parses data from the selected problem text file */
@@ -64,8 +69,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.sequence = Utility.shuffle(this.sequence);
     // this.sequence = [1, 2, 0];
     this.seqLabel = this.sequence.toString();
-    const makespan = this.ps.evaluateSolution(this.sequence);
-    console.log('seq:', this.sequence, 'makespan: ', makespan);
+    const solution = this.ps.evaluateSolution(this.sequence);
+    console.log('seq:', this.sequence, 'makespan: ', solution.Makespan);
+    this.cs.setCanvasCoordinates(solution.Jobs, solution.Makespan);
+    this.cs.drawGanttScheme();
   }
 
 }
