@@ -2,6 +2,15 @@
 export class Utility {
 
     /**
+     * Adds zero padding to given number.
+     * @param num Number
+     * @param size Length of returning string
+     */
+    public static pad(num, size) {
+        return ('000000000' + num).substr(-size);
+    }
+
+    /**
      * Shuffles the provided array.
      * @param arr Array to be shuffled.
      */
@@ -16,5 +25,7 @@ export class Utility {
         }
         return arr;
     }
+
+
 
 }

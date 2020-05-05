@@ -51,10 +51,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   /** Parses data from the selected problem text file */
   selectProblem() {
+    this.ps.resetProblem();
+    this.cs.clearCanvas();
     console.log('Selected problem:', this.ps.problem.Name);
     this.ps.readProblem(this.ps.problem.Name).subscribe(x => {
       console.log(x);
       this.ps.parseProblem(x);
+      this.cs.setCanvasHeight(this.ps.problem.NumberOfMachines);
+      this.cs.layer1.canvas.height = this.cs.canvasHeight;
+      this.cs.layer2.canvas.height = this.cs.canvasHeight;
     });
   }
 

@@ -111,7 +111,7 @@ export class ProblemService {
   resetProblem() {
     this.problem.BoundUpper = undefined;
     this.problem.BoundLower = undefined;
-    this.problem.Name = '';
+    // this.problem.Name = ''; (name already changes on problem selection in home, if needed elsewhere create another method)
     this.problem.NumberOfJobs = 0;
     this.problem.NumberOfMachines = 0;
     this.problem.ProcessingTimes = [];
