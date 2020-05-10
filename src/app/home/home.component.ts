@@ -1,14 +1,17 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProblemService } from '../core/problem.service';
 import { Utility } from '../shared/utililty';
-import { CanvasService } from '../core/canvas.service';
+import { GanttComponent } from '../gantt/gantt.component';
 /** HomeComponent */
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit {
+
+  /** Reference to Gannt Chart component */
+  @ViewChild(GanttComponent, { static: false }) private gantt: GanttComponent;
 
   /** List of problem names */
   problemList: string[] = [];
@@ -16,15 +19,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   sequence: number[] = [0, 1, 2];  // temporary***
   seqLabel: any = '0, 1, 2';  // temp***
 
-  /** Canvas reference */
-  @ViewChild('layer1', { static: false }) canvasElem: ElementRef;
-  /** Canvas background layer reference */
-  @ViewChild('layer2', { static: false }) canvasElem2: ElementRef;
 
-  constructor(
-    private cs: CanvasService,
-    private ps: ProblemService
-  ) { }
+  constructor(private ps: ProblemService) { }
 
   /** ngOnInit */
   ngOnInit() {
@@ -34,33 +30,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
     });
   }
 
-  /** Size canvas' after view inits */
-  ngAfterViewInit(): void {
-    this.prepareCanvas();
-  }
-
-  /** Prepares canvas' dimensions */
-  prepareCanvas() {
-    this.cs.canvasWidth = window.innerWidth;
-    this.cs.layer1 = (this.canvasElem.nativeElement as HTMLCanvasElement).getContext('2d');
-    this.cs.layer1.canvas.height = this.cs.canvasHeight;
-    this.cs.layer1.canvas.width = this.cs.canvasWidth;
-    this.cs.layer2 = (this.canvasElem2.nativeElement as HTMLCanvasElement).getContext('2d');
-    this.cs.layer2.canvas.height = this.cs.canvasHeight;
-    this.cs.layer2.canvas.width = this.cs.canvasWidth;
-  }
-
   /** Parses data from the selected problem text file */
   selectProblem() {
     this.ps.resetProblem();
-    this.cs.clearCanvas();
     console.log('Selected problem:', this.ps.problem.Name);
     this.ps.readProblem(this.ps.problem.Name).subscribe(x => {
       console.log(x);
       this.ps.parseProblem(x);
-      this.cs.setCanvasSize(this.ps.problem.NumberOfMachines);
-      this.cs.layer1.canvas.height = this.cs.canvasHeight;
-      this.cs.layer2.canvas.height = this.cs.canvasHeight;
     });
   }
 
@@ -77,8 +53,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.seqLabel = this.sequence.toString();
     const solution = this.ps.evaluateSolution(this.sequence);
     console.log('seq:', this.sequence, 'makespan: ', solution.Makespan);
-    this.cs.setCanvasCoordinates(solution.Jobs, solution.Makespan);
-    this.cs.drawGanttScheme();
+    this.gantt.drawGanttChart(solution);
   }
 
 }

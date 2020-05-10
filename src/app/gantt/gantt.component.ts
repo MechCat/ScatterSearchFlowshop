@@ -1,12 +1,19 @@
-import { Injectable } from '@angular/core';
-import { Job } from '../shared/models';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Utility } from '../shared/utililty';
+import { Job, Solution } from '../shared/models';
 
-/** Canvas service */
-@Injectable({
-  providedIn: 'root'
+/** Gantt Component */
+@Component({
+  selector: 'app-gantt',
+  templateUrl: './gantt.component.html',
+  styleUrls: ['./gantt.component.scss']
 })
-export class CanvasService {  // (component instead of a service could be feasible for multiple problems)
+export class GanttComponent implements OnInit, AfterViewInit {
+
+  /** Canvas reference */
+  @ViewChild('layer1', { static: false }) canvasElem: ElementRef;
+  /** Canvas background layer reference */
+  @ViewChild('layer2', { static: false }) canvasElem2: ElementRef;
 
   /** Canvas coordinates, corresponding to Jobs */
   jobBlocks: JobBlock[][] = [];
@@ -29,7 +36,15 @@ export class CanvasService {  // (component instead of a service could be feasib
 
   constructor() { }
 
-  /** Clears canvas */
+  /** ngOnInit */
+  ngOnInit() { }
+
+  /** Size canvas' after view inits */
+  ngAfterViewInit(): void {
+    this.prepareCanvas();
+  }
+
+  /** Clears canvas. */
   clearCanvas() {
     this.layer1.beginPath();
     this.layer1.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -43,26 +58,20 @@ export class CanvasService {  // (component instead of a service could be feasib
     this.layer2.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
   }
 
-  /** Draws the flowshop solution stored in jobBlocks property */
-  drawGanttScheme() {
+  /**
+   * Draws the flowshop solution.
+   * @param solution Problem solution: containing job start-fin times, sequence, makespan etc.
+   */
+  drawGanttChart(solution: Solution) {
+    this.setCanvasSize(solution.Jobs.length);
+    this.setCanvasCoordinates(solution.Jobs, solution.Makespan);
     this.drawGuidelines(10, 23);
-    this.layer1.strokeStyle = this.styles.border;
-    for (let m = 0; m < this.jobBlocks.length; m++) {
-      for (let j = 0; j < this.jobBlocks[m].length; j++) {
-        this.drawRect(
-          this.jobBlocks[m][j].Start,
-          (this.jobBlockGap + this.jobBlockHeight) * (m + 1),
-          this.jobBlocks[m][j].Width,
-          this.jobBlockHeight,
-          this.jobBlocks[m][j].Color
-        );
-      }
-    }
+    this.drawJobBlocks();
   }
 
   /**
    * Draws labels and time marks along the axis' of chart.
-   * @param lineCount Number of guidelines
+   * @param lineCount Number of guidelines.
    * @param makespan Solution cost, used to label guidelines.
    */
   drawGuidelines(lineCount: number, makespan: number) {
@@ -110,13 +119,29 @@ export class CanvasService {  // (component instead of a service could be feasib
     //#endregion
   }
 
+  /** Draws job blocks. */
+  drawJobBlocks() {
+    this.layer1.strokeStyle = this.styles.border;
+    for (let m = 0; m < this.jobBlocks.length; m++) {
+      for (let j = 0; j < this.jobBlocks[m].length; j++) {
+        this.drawRect(
+          this.jobBlocks[m][j].x,
+          (this.jobBlockGap + this.jobBlockHeight) * (m + 1),
+          this.jobBlocks[m][j].w,
+          this.jobBlockHeight,
+          this.jobBlocks[m][j].Color
+        );
+      }
+    }
+  }
+
   /**
    * Draws a rectangle representing a job on Gantt chart.
-   * @param x starting X coordinate
-   * @param y starting Y coordinate
-   * @param w width of rectangle
-   * @param h height of rectangle
-   * @param color color of rectangle fill
+   * @param x starting X coordinate.
+   * @param y starting Y coordinate.
+   * @param w width of rectangle.
+   * @param h height of rectangle.
+   * @param color color of rectangle fill.
    */
   drawRect(x: number, y: number, w: number, h: number, color: string) {
     this.layer1.fillStyle = color;
@@ -126,9 +151,20 @@ export class CanvasService {  // (component instead of a service could be feasib
     this.layer1.stroke();
   }
 
+  /** Prepares canvas' dimensions. */
+  prepareCanvas() {
+    this.canvasWidth = window.innerWidth;
+    this.layer1 = (this.canvasElem.nativeElement as HTMLCanvasElement).getContext('2d');
+    this.layer1.canvas.height = this.canvasHeight;
+    this.layer1.canvas.width = this.canvasWidth;
+    this.layer2 = (this.canvasElem2.nativeElement as HTMLCanvasElement).getContext('2d');
+    this.layer2.canvas.height = this.canvasHeight;
+    this.layer2.canvas.width = this.canvasWidth;
+  }
+
   /**
-   * Translates job start/end times to canvas coordinates
-   * @param jobs Solution job list with schedule times
+   * Translates job start/end times to canvas coordinates.
+   * @param jobs Solution job list with schedule times.
    * @param makespan Makespan of solution. Used as base to scale coordinates.
    */
   setCanvasCoordinates(jobs: Job[][], makespan: number) {
@@ -143,45 +179,39 @@ export class CanvasService {  // (component instead of a service could be feasib
       const row: JobBlock[] = [];
       for (let j = 0; j < jobs[0].length; j++) {
         const jobBlock: JobBlock = {
-          Start: Math.round(jobs[m][j].Start * scaleIndex) + this.canvasPadding,
-          Width: Math.round(jobs[m][j].ProcessTime * scaleIndex),
+          x: Math.round(jobs[m][j].Start * scaleIndex) + this.canvasPadding,
+          y: (this.jobBlockGap + this.jobBlockHeight) * (m + 1),
+          w: Math.round(jobs[m][j].ProcessTime * scaleIndex),
+          h: this.jobBlockHeight,
           Color: colors[j]
         };
         row.push(jobBlock);
       }
       this.jobBlocks.push(row);
     }
-    console.log('scaleIndex', scaleIndex);
+    console.log('drawing scaleIndex', scaleIndex);
     console.log('jobBlocks', this.jobBlocks);
   }
 
   /**
-   * Sets canvas height to span all machines
-   * @param machineCount Number of machines in the problem
+   * Sets canvas height to span all machines.
+   * @param machineCount Number of machines in the problem.
    */
   setCanvasSize(machineCount) {
     this.canvasHeight = (this.jobBlockHeight + this.jobBlockGap) * (machineCount + 2);
     this.canvasWidth = window.innerWidth;
   }
-
-}
-
-interface Canvas {
-  /** Canvas context */
-  Context: CanvasRenderingContext2D;
-  /** Edge length of canvas (square) */
-  Size: number;
-  /** Padding, used to confine all coordinates in drawable area with soft empty space before borders */
-  Padding: number;
-  /** Canvas representation [machine][jobBlock]. */
-  Coords: JobBlock[][];
 }
 
 interface JobBlock {
-  /** Starting left coordinate */
-  Start: number;
-  /** Wıdth of job block */
-  Width: number;
-  /** Color of block */
+  /** Starting X coordinate. */
+  x: number;
+  /** Starting Y coordinate. */
+  y: number;
+  /** Width of job block. */
+  w: number;
+  /** Height of job block. */
+  h: number;
+  /** Color of block. */
   Color: string;
 }
