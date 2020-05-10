@@ -159,8 +159,9 @@ export class CanvasService {  // (component instead of a service could be feasib
    * Sets canvas height to span all machines
    * @param machineCount Number of machines in the problem
    */
-  setCanvasHeight(machineCount) {
+  setCanvasSize(machineCount) {
     this.canvasHeight = (this.jobBlockHeight + this.jobBlockGap) * (machineCount + 2);
+    this.canvasWidth = window.innerWidth;
   }
 
 }

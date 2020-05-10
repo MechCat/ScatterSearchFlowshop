@@ -4,7 +4,6 @@
 }
 
 .canvas {
-    border: 1px solid black;
     position: absolute;
     top: 0;
     left: 0;
@@ -12,15 +11,20 @@
 
 .component-container {
     justify-content: center;
-    display: grid;
-    grid-template-rows: 4em auto;
 }
 
 .control-panel {
     background-color: darkkhaki;
-    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    justify-items: center;
+    align-items: center;
+}
+
+.info {
+    background-color: whitesmoke;
 }
 
 .problem-selector {
-    width: 20em;
+    // width: 20em;
 }

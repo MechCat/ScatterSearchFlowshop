@@ -15,8 +15,11 @@
             sequence</button>
     </div>
     <!-- Canvas -->
-    <div class="canvas-panel">
+    <div class="canvas-panel" [ngStyle]="{  'height': cs.canvasHeight +'px'}">
         <canvas #layer2 class="canvas"></canvas>
         <canvas #layer1 class="canvas"></canvas>
+    </div>
+    <div class="info">
+        Output info
     </div>
 </div>

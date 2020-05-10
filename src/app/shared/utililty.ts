@@ -26,6 +26,4 @@ export class Utility {
         return arr;
     }
 
-
-
 }

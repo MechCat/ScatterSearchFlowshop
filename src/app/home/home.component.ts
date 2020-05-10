@@ -41,6 +41,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   /** Prepares canvas' dimensions */
   prepareCanvas() {
+    this.cs.canvasWidth = window.innerWidth;
     this.cs.layer1 = (this.canvasElem.nativeElement as HTMLCanvasElement).getContext('2d');
     this.cs.layer1.canvas.height = this.cs.canvasHeight;
     this.cs.layer1.canvas.width = this.cs.canvasWidth;
@@ -57,7 +58,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.ps.readProblem(this.ps.problem.Name).subscribe(x => {
       console.log(x);
       this.ps.parseProblem(x);
-      this.cs.setCanvasHeight(this.ps.problem.NumberOfMachines);
+      this.cs.setCanvasSize(this.ps.problem.NumberOfMachines);
       this.cs.layer1.canvas.height = this.cs.canvasHeight;
       this.cs.layer2.canvas.height = this.cs.canvasHeight;
     });
