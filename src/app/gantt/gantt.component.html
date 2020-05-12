@@ -1,4 +1,4 @@
-<div class="canvas-panel" [ngStyle]="{  'height': canvasHeight +'px'}">
+<div class="canvas-panel" [ngStyle]="{  'height': canvasHeight +'px'}" (mousemove)="onMouseMove($event)">
     <canvas #layer2 class="canvas"></canvas>
     <canvas #layer1 class="canvas"></canvas>
 </div>

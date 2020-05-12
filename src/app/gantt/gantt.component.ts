@@ -151,6 +151,25 @@ export class GanttComponent implements OnInit, AfterViewInit {
     this.layer1.stroke();
   }
 
+  /**
+   * Detects index of the job block the mouse is on.
+   * @param event Mouse event
+   */
+  onMouseMove(event: MouseEvent) {
+    const bounds = this.canvasElem.nativeElement.getBoundingClientRect();
+    const x = event.clientX - bounds.left;
+    const y = event.clientY - bounds.top;
+    for (let m = 0; m < this.jobBlocks.length; m++) {
+      for (let i = this.jobBlocks[m].length - 1; i >= 0; i--) {
+        const b = this.jobBlocks[m][i];
+        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) {
+          console.log(m, i);
+          break;
+        }
+      }
+    }
+  }
+
   /** Prepares canvas' dimensions. */
   prepareCanvas() {
     this.canvasWidth = window.innerWidth;
