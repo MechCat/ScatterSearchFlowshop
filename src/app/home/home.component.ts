@@ -11,7 +11,7 @@ import { GanttComponent } from '../gantt/gantt.component';
 export class HomeComponent implements OnInit {
 
   /** Reference to Gannt Chart component */
-  @ViewChild(GanttComponent, { static: false }) private gantt: GanttComponent;
+  @ViewChild(GanttComponent) private gantt: GanttComponent;
 
   /** List of problem names */
   problemList: string[] = [];
@@ -20,7 +20,7 @@ export class HomeComponent implements OnInit {
   seqLabel: any = '0, 1, 2';  // temp***
 
 
-  constructor(private ps: ProblemService) { }
+  constructor(public ps: ProblemService) { }
 
   /** ngOnInit */
   ngOnInit() {

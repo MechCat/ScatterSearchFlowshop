@@ -11,9 +11,9 @@ import { Job, Solution } from '../shared/models';
 export class GanttComponent implements OnInit, AfterViewInit {
 
   /** Canvas reference */
-  @ViewChild('layer1', { static: false }) canvasElem: ElementRef;
+  @ViewChild('layer1') canvasElem: ElementRef;
   /** Canvas background layer reference */
-  @ViewChild('layer2', { static: false }) canvasElem2: ElementRef;
+  @ViewChild('layer2') canvasElem2: ElementRef;
 
   /** Canvas coordinates, corresponding to Jobs */
   jobBlocks: JobBlock[][] = [];
