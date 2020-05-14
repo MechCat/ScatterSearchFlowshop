@@ -1,4 +1,19 @@
-<div class="canvas-panel" [ngStyle]="{  'height': canvasHeight +'px'}" (mousemove)="onMouseMove($event)">
-    <canvas #layer2 class="canvas"></canvas>
-    <canvas #layer1 class="canvas"></canvas>
+<div>
+    <svg [attr.height]="canvasHeight" [attr.width]="canvasWidth">
+        <g id='axis'></g>
+        <g id='labels'></g>
+        <g id='guidelines'></g>
+        <g id='machines'>
+            <g *ngFor="let machines of jobBlocks">
+                <rect *ngFor="let job of machines" class="job" [attr.x]="job.x" [attr.y]="job.y" [attr.width]="job.w"
+                    [attr.height]="job.h" [attr.fill]="job.Color" stroke="black" />
+            </g>
+        </g>
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="1" refY="5" markerUnits="strokeWidth" markerWidth="8"
+                markerHeight="10" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="hsla(0,0%,0%,1)" />
+            </marker>
+        </defs>
+    </svg>
 </div>

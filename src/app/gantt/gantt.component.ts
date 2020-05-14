@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Utility } from '../shared/utililty';
 import { Job, Solution } from '../shared/models';
 
@@ -8,30 +8,21 @@ import { Job, Solution } from '../shared/models';
   templateUrl: './gantt.component.html',
   styleUrls: ['./gantt.component.scss']
 })
-export class GanttComponent implements OnInit, AfterViewInit {
+export class GanttComponent implements OnInit {
 
-  /** Canvas reference */
-  @ViewChild('layer1') canvasElem: ElementRef;
-  /** Canvas background layer reference */
-  @ViewChild('layer2') canvasElem2: ElementRef;
-
-  /** Canvas coordinates, corresponding to Jobs */
+  /** Canvas coordinates, corresponding to Jobs. */
   jobBlocks: JobBlock[][] = [];
-  /** Canvas height */
+  /** Canvas height. */
   canvasHeight = 320;
-  /** To confine all coordinates in drawable area */
-  canvasPadding = 40;
-  /** Canvas width */
+  /** To confine all coordinates in drawable area. */
+  canvasPadding = 50;
+  /** Canvas width. */
   canvasWidth = 800;
-  /** Height of a job block */
+  /** Height of a job block. */
   jobBlockHeight = 16;
-  /** Height between job blocks */
+  /** Height between job blocks. */
   jobBlockGap = 8;
-  /** Canvas layer1 context */
-  layer1: CanvasRenderingContext2D;
-  /** Canvas layer2 context */
-  layer2: CanvasRenderingContext2D;
-  /** Common canvas styles */
+  /** Common styles. */
   styles = { border: 'hsla(0,0%,0%,1)', guideline: 'hsla(240,100%,50%,0.2)' };
 
   constructor() { }
@@ -39,23 +30,12 @@ export class GanttComponent implements OnInit, AfterViewInit {
   /** ngOnInit */
   ngOnInit() { }
 
-  /** Size canvas' after view inits */
-  ngAfterViewInit(): void {
-    this.prepareCanvas();
-  }
-
-  /** Clears canvas. */
-  clearCanvas() {
-    this.layer1.beginPath();
-    this.layer1.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.clearBackground();
+  /** Clears all svg sub-elements. */
+  clear() {
+    document.getElementById('axis').innerHTML = '';
+    document.getElementById('guidelines').innerHTML = '';
+    document.getElementById('labels').innerHTML = '';
     this.jobBlocks = [];
-  }
-
-  /** Clears only the background canvas. */
-  clearBackground() {
-    this.layer2.beginPath();
-    this.layer2.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
   }
 
   /**
@@ -63,10 +43,11 @@ export class GanttComponent implements OnInit, AfterViewInit {
    * @param solution Problem solution: containing job start-fin times, sequence, makespan etc.
    */
   drawGanttChart(solution: Solution) {
+    this.clear();
     this.setCanvasSize(solution.Jobs.length);
     this.setCanvasCoordinates(solution.Jobs, solution.Makespan);
-    this.drawGuidelines(10, 23);
-    this.drawJobBlocks();
+    this.drawGuidelines(10, solution.Makespan);
+    // job blocks are drawn through ngFor using jobBlocks
   }
 
   /**
@@ -75,7 +56,6 @@ export class GanttComponent implements OnInit, AfterViewInit {
    * @param makespan Solution cost, used to label guidelines.
    */
   drawGuidelines(lineCount: number, makespan: number) {
-    this.layer2.strokeStyle = this.styles.border;
     const chartArea = {
       Left: this.canvasPadding,
       Right: this.canvasWidth - this.canvasPadding,
@@ -85,100 +65,45 @@ export class GanttComponent implements OnInit, AfterViewInit {
 
     //#region Axis
     // vertical axis
-    this.layer2.beginPath();
-    this.layer2.moveTo(chartArea.Left - this.jobBlockGap, chartArea.Top - this.jobBlockGap);
-    this.layer2.lineTo(chartArea.Left - this.jobBlockGap, chartArea.Bottom); // ...so further add/subs not required.
-    this.layer2.stroke();
+    this.svgLine(
+      chartArea.Left - this.jobBlockGap, chartArea.Bottom,
+      chartArea.Left - this.jobBlockGap, chartArea.Top - this.jobBlockGap,
+      this.styles.border, 1, true, 'axis'
+    );
     // horizontal axis
-    this.layer2.beginPath();
-    this.layer2.moveTo(chartArea.Left - this.jobBlockGap, chartArea.Bottom);
-    this.layer2.lineTo(chartArea.Right + this.jobBlockGap, chartArea.Bottom);
-    this.layer2.stroke();
+    this.svgLine(
+      chartArea.Left - this.jobBlockGap, chartArea.Bottom,
+      chartArea.Right + this.jobBlockGap, chartArea.Bottom,
+      this.styles.border, 1, true, 'axis'
+    );
     //#endregion
 
     //#region Guidelines & Labels
-    // times
     const divideRatio = 1 / (lineCount - 1);
     // machines
     for (let i = 0; i < this.jobBlocks.length; i++) {
       const label = 'M' + Utility.pad(i, 3);
-      this.layer2.fillText(label, 5, (this.jobBlockGap + this.jobBlockHeight) * (i + 1) + (this.jobBlockGap + this.jobBlockHeight) / 2);
+      this.svgText(
+        label,
+        (this.canvasPadding / 2) - this.jobBlockGap,
+        (this.jobBlockGap + this.jobBlockHeight) * (i + 1) + (this.jobBlockGap + this.jobBlockHeight) / 2,
+        this.styles.border, 'labels');
     }
+    // times
     for (let i = 0; i < lineCount; i++) {
-      // label
       const label = '' + Math.round(makespan * i * divideRatio * 100) / 100;
       const x = (this.canvasWidth - 2 * this.canvasPadding) * divideRatio * i + this.canvasPadding;
-      this.layer2.fillText(label, x, this.canvasHeight - 5);
+      // label
+      this.svgText(label, x, this.canvasHeight - 5, this.styles.border, 'labels');
       // guideline
-      this.layer2.strokeStyle = this.styles.guideline;
-      this.layer2.beginPath();
-      this.layer2.moveTo(x, chartArea.Top);
-      this.layer2.lineTo(x, chartArea.Bottom);
-      this.layer2.stroke();
+      this.svgLine(x, chartArea.Top, x, chartArea.Bottom, this.styles.guideline, 1, false, 'guidelines');
     }
     //#endregion
-  }
-
-  /** Draws job blocks. */
-  drawJobBlocks() {
-    this.layer1.strokeStyle = this.styles.border;
-    for (let m = 0; m < this.jobBlocks.length; m++) {
-      for (let j = 0; j < this.jobBlocks[m].length; j++) {
-        this.drawRect(
-          this.jobBlocks[m][j].x,
-          (this.jobBlockGap + this.jobBlockHeight) * (m + 1),
-          this.jobBlocks[m][j].w,
-          this.jobBlockHeight,
-          this.jobBlocks[m][j].Color
-        );
-      }
-    }
-  }
-
-  /**
-   * Draws a rectangle representing a job on Gantt chart.
-   * @param x starting X coordinate.
-   * @param y starting Y coordinate.
-   * @param w width of rectangle.
-   * @param h height of rectangle.
-   * @param color color of rectangle fill.
-   */
-  drawRect(x: number, y: number, w: number, h: number, color: string) {
-    this.layer1.fillStyle = color;
-    this.layer1.beginPath();
-    this.layer1.fillRect(x, y, w, h);
-    this.layer1.rect(x, y, w, h);
-    this.layer1.stroke();
-  }
-
-  /**
-   * Detects index of the job block the mouse is on.
-   * @param event Mouse event
-   */
-  onMouseMove(event: MouseEvent) {
-    const bounds = this.canvasElem.nativeElement.getBoundingClientRect();
-    const x = event.clientX - bounds.left;
-    const y = event.clientY - bounds.top;
-    for (let m = 0; m < this.jobBlocks.length; m++) {
-      for (let i = this.jobBlocks[m].length - 1; i >= 0; i--) {
-        const b = this.jobBlocks[m][i];
-        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) {
-          console.log(m, i);
-          break;
-        }
-      }
-    }
   }
 
   /** Prepares canvas' dimensions. */
   prepareCanvas() {
     this.canvasWidth = window.innerWidth;
-    this.layer1 = (this.canvasElem.nativeElement as HTMLCanvasElement).getContext('2d');
-    this.layer1.canvas.height = this.canvasHeight;
-    this.layer1.canvas.width = this.canvasWidth;
-    this.layer2 = (this.canvasElem2.nativeElement as HTMLCanvasElement).getContext('2d');
-    this.layer2.canvas.height = this.canvasHeight;
-    this.layer2.canvas.width = this.canvasWidth;
   }
 
   /**
@@ -219,6 +144,72 @@ export class GanttComponent implements OnInit, AfterViewInit {
   setCanvasSize(machineCount) {
     this.canvasHeight = (this.jobBlockHeight + this.jobBlockGap) * (machineCount + 2);
     this.canvasWidth = window.innerWidth;
+  }
+
+  /**
+   * Draws a line on the main svg.
+   * @param x1 x1.
+   * @param y1 y1.
+   * @param x2 x2.
+   * @param y2 y2.
+   * @param stroke Stroke color.
+   * @param strokeWidth Stroke width.
+   * @param markerEnd Add an arrow marker at end of line.
+   * @param target Target element id.
+   */
+  svgLine(x1, y1, x2, y2, stroke: string, strokeWidth, markerEnd: boolean, target: string) {
+    const svg = document.getElementById(target);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttributeNS(null, 'x1', x1);
+    line.setAttributeNS(null, 'y1', y1);
+    line.setAttributeNS(null, 'x2', x2);
+    line.setAttributeNS(null, 'y2', y2);
+    line.setAttributeNS(null, 'stroke', stroke);
+    line.setAttributeNS(null, 'stroke-width', strokeWidth);
+    if (markerEnd)
+      line.setAttributeNS(null, 'marker-end', 'url(#arrow)');
+    line.classList.add('guideline');
+    svg.appendChild(line);
+  }
+
+  /**
+   * Draws a polygon on the main svg.
+   * @param points Edges of the polygon (format eg: ['10,10' , '50,20']).
+   * @param stroke Stroke color.
+   * @param fill Fill color.
+   * @param target Target element id.
+   */
+  svgPolygon(points: string[], stroke: string, fill: string, target: string) {
+    const svg = document.getElementById(target);
+    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    let p = '';
+    points.forEach(e => {
+      p += e + ' ';
+    });
+    polygon.setAttributeNS(null, 'points', p);
+    polygon.setAttributeNS(null, 'stroke', stroke);
+    polygon.setAttributeNS(null, 'fill', fill);
+    svg.appendChild(polygon);
+  }
+
+  /**
+   * Writes a text on the main svg.
+   * @param text Text context.
+   * @param x x.
+   * @param y y.
+   * @param fill Fill color.
+   * @param target Target element id.
+   */
+  svgText(text: string, x, y, fill: string, target: string) {
+    const svg = document.getElementById(target);
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.innerHTML = text;
+    t.setAttributeNS(null, 'x', x);
+    t.setAttributeNS(null, 'y', y);
+    t.setAttributeNS(null, 'fill', fill);
+    t.setAttributeNS(null, 'text-anchor', 'middle');  // param these?
+    t.setAttributeNS(null, 'font-size', '0.75rem'); // param these?
+    svg.appendChild(t);
   }
 }
 
