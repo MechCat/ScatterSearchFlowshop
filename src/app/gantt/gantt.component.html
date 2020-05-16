@@ -1,12 +1,15 @@
+<!-- Chart -->
 <div>
     <svg [attr.height]="canvasHeight" [attr.width]="canvasWidth">
         <g id='axis'></g>
         <g id='labels'></g>
         <g id='guidelines'></g>
         <g id='machines'>
-            <g *ngFor="let machines of jobBlocks">
-                <rect *ngFor="let job of machines" class="job" [attr.x]="job.x" [attr.y]="job.y" [attr.width]="job.w"
-                    [attr.height]="job.h" [attr.fill]="job.Color" stroke="black" />
+            <g *ngFor="let machines of jobBlocks; let m = index">
+                <rect *ngFor="let job of machines; let j = index" class="job" (click)="openDialog(job, j, m)" [attr.x]="job.x"
+                    [attr.y]="job.y" [attr.width]="job.w" [attr.height]="job.h" [attr.fill]="job.Color" stroke="black"
+                    matTooltipPosition="above"
+                    matTooltip="M{{m}}, J{{job.Name}} (O:{{j}}) / P:{{job.ProcessTime}} / S:{{job.Start}} 🠊 E:{{job.End}}" />
             </g>
         </g>
         <defs>

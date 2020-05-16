@@ -12,3 +12,19 @@
 .job:hover {
     stroke-width: 0.16rem;
 }
+
+.job-dialog {
+    width: 20rem;
+    text-align: center;
+}
+.jd-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.jd-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Utility } from '../shared/utililty';
 import { Job, Solution } from '../shared/models';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 /** Gantt Component */
 @Component({
@@ -25,7 +26,7 @@ export class GanttComponent implements OnInit {
   /** Common styles. */
   styles = { border: 'hsla(0,0%,0%,1)', guideline: 'hsla(240,100%,50%,0.2)' };
 
-  constructor() { }
+  constructor(public dialog: MatDialog) { }
 
   /** ngOnInit */
   ngOnInit() { }
@@ -101,6 +102,16 @@ export class GanttComponent implements OnInit {
     //#endregion
   }
 
+  /**
+   * Opens details for selected job.
+   * @param job Job object containing times and job info.
+   * @param order Sequence order of the job.
+   * @param machine Current machine.
+   */
+  openDialog(job: JobBlock, order: number, machine: number): void {
+    const dialogRef = this.dialog.open(GanttJobDetailDialogComponent, { data: { job, order, machine } });
+  }
+
   /** Prepares canvas' dimensions. */
   prepareCanvas() {
     this.canvasWidth = window.innerWidth;
@@ -127,7 +138,11 @@ export class GanttComponent implements OnInit {
           y: (this.jobBlockGap + this.jobBlockHeight) * (m + 1),
           w: Math.round(jobs[m][j].ProcessTime * scaleIndex),
           h: this.jobBlockHeight,
-          Color: colors[j]
+          Color: colors[j],
+          Start: jobs[m][j].Start,
+          ProcessTime: jobs[m][j].ProcessTime,
+          End: jobs[m][j].End,
+          Name: jobs[m][j].Name,
         };
         row.push(jobBlock);
       }
@@ -174,7 +189,7 @@ export class GanttComponent implements OnInit {
 
   /**
    * Draws a polygon on the main svg.
-   * @param points Edges of the polygon (format eg: ['10,10' , '50,20']).
+   * @param points Edges of the polygon (format eg: ['10,10', '50,20']).
    * @param stroke Stroke color.
    * @param fill Fill color.
    * @param target Target element id.
@@ -213,7 +228,21 @@ export class GanttComponent implements OnInit {
   }
 }
 
-interface JobBlock {
+/** Job Detail dialog component */
+@Component({
+  selector: 'app-gantt-job-detail',
+  templateUrl: 'job-detail.html',
+  styleUrls: ['./gantt.component.scss']
+})
+export class GanttJobDetailDialogComponent {
+
+  constructor(
+    public dialogRef: MatDialogRef<GanttJobDetailDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data) { }
+
+}
+
+interface JobBlock extends Job {
   /** Starting X coordinate. */
   x: number;
   /** Starting Y coordinate. */

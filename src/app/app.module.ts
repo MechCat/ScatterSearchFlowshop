@@ -7,7 +7,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
-import { GanttComponent } from './gantt/gantt.component';
+import { GanttComponent, GanttJobDetailDialogComponent } from './gantt/gantt.component';
+import { FormsModule } from '@angular/forms';
 
 /** app.module */
 @NgModule({
@@ -16,10 +17,14 @@ import { GanttComponent } from './gantt/gantt.component';
     HomeComponent,
     GanttComponent
   ],
+  entryComponents: [
+    GanttJobDetailDialogComponent
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    FormsModule,
     HttpClientModule,
     MaterialModule
   ],
