@@ -9,61 +9,61 @@ import { Solution, Job } from '../shared/models';
 })
 export class ProblemService {
 
-  /** Problem representation instance */
+  /** Problem representation instance. */
   problem: Problem = {
-    BoundLower: undefined,
-    BoundUpper: undefined,
-    NumberOfMachines: 0,
-    NumberOfJobs: 0,
-    Name: '',
-    ProcessingTimes: []
+    boundLower: undefined,
+    boundUpper: undefined,
+    numberOfMachines: 0,
+    numberOfJobs: 0,
+    name: '',
+    processingTimes: []
   };
 
   constructor(private http: HttpClient) { }
 
   /**
    * Calculates solution makespan.
-   * @param sequence Solution sequence of jobs
-   * @return Makespan of given solution
+   * @param sequence Solution sequence of jobs.
+   * @return Makespan of given solution.
    */
   evaluateSolution(sequence: number[]): Solution {
     const sol = new Solution(sequence);
 
-    for (let i = 0; i < this.problem.NumberOfMachines; i++) {
+    for (let i = 0; i < this.problem.numberOfMachines; i++) {
       const jobsOfCurrentMachine: Job[] = [];
 
       if (i === 0) {  // 1st machine
         let jobStart = 0;
-        for (let j = 0; j < this.problem.NumberOfJobs; j++) {
-          const jobEnd = jobStart + this.problem.ProcessingTimes[0][sequence[j]]; // prep. & cleaning times here if needed
-          const job: Job = { Start: jobStart, End: jobEnd, ProcessTime: this.problem.ProcessingTimes[0][sequence[j]], Name: sequence[j] };
+        for (let j = 0; j < this.problem.numberOfJobs; j++) {
+          const jobEnd = jobStart + this.problem.processingTimes[0][sequence[j]]; // prep. & cleaning times here if needed
+          const job: Job = { start: jobStart, end: jobEnd, processTime: this.problem.processingTimes[0][sequence[j]], name: sequence[j] };
           jobsOfCurrentMachine.push(job);
           jobStart = jobEnd;
         }
       } else { // other machines
-        for (let j = 0; j < this.problem.NumberOfJobs; j++) {
+        for (let j = 0; j < this.problem.numberOfJobs; j++) {
           let jobStart;
-          const endOfPrevMachine = sol.Jobs[i - 1][j].End;
-          const endOfPrevJob = (jobsOfCurrentMachine[j - 1] !== undefined) ? jobsOfCurrentMachine[j - 1].End : 0;
+          const endOfPrevMachine = sol.jobs[i - 1][j].end;
+          const endOfPrevJob = (jobsOfCurrentMachine[j - 1] !== undefined) ? jobsOfCurrentMachine[j - 1].end : 0;
 
           if (endOfPrevJob > endOfPrevMachine)
             jobStart = endOfPrevJob;
           else
             jobStart = endOfPrevMachine;
 
-          const jobEnd = jobStart + this.problem.ProcessingTimes[i][sequence[j]];  // prep. & cleaning times here if needed
-          const job: Job = { Start: jobStart, End: jobEnd, ProcessTime: this.problem.ProcessingTimes[i][sequence[j]], Name: sequence[j] };
+          const jobEnd = jobStart + this.problem.processingTimes[i][sequence[j]];  // prep. & cleaning times here if needed
+          const job: Job = { start: jobStart, end: jobEnd, processTime: this.problem.processingTimes[i][sequence[j]], name: sequence[j] };
           jobsOfCurrentMachine.push(job);
         }
       }
-      sol.Jobs.push(jobsOfCurrentMachine);
+      sol.jobs.push(jobsOfCurrentMachine);
     }
-    sol.Makespan = sol.Jobs[this.problem.NumberOfMachines - 1][this.problem.NumberOfJobs - 1].End;
+    sol.makespan = sol.jobs[this.problem.numberOfMachines - 1][this.problem.numberOfJobs - 1].end;
     console.log('solution:', sol);
     return sol;
   }
 
-  /** Reads the problem names listed in assets...problems.json */
+  /** Reads the problem names listed in assets...problems.json . */
   getProblemNames() {
     return this.http.get('assets/problems/problems.json');
   }
@@ -71,7 +71,7 @@ export class ProblemService {
   /**
    * Sets problem instance according to given problem string.
    * Parsing is set to read Taillard's problem format (examples: assets/problems/taXXX.txt).
-   * @param filetext Contents of problem file in string format
+   * @param filetext Contents of problem file in string format.
    */
   parseProblem(filetext: string) {
     // Example Tai file below (row#0: titles, row#1: properties, row#2: pTimes title, rest: processing times)
@@ -87,49 +87,48 @@ export class ProblemService {
     const rows = filetext.split(/[\n]/);
 
     const tempProperties = rows[1].match(/[0-9]+/g);
-    this.problem.NumberOfJobs = Number(tempProperties[0]);
-    this.problem.NumberOfMachines = Number(tempProperties[1]);
-    this.problem.BoundUpper = Number(tempProperties[3]);
-    this.problem.BoundLower = Number(tempProperties[4]);
+    this.problem.numberOfJobs = Number(tempProperties[0]);
+    this.problem.numberOfMachines = Number(tempProperties[1]);
+    this.problem.boundUpper = Number(tempProperties[3]);
+    this.problem.boundLower = Number(tempProperties[4]);
 
     for (let i = 3; i < rows.length; i++) { // starting from the rows[3] where processing times are
       const tempArr = rows[i].match(/[0-9]+/g);
-      this.problem.ProcessingTimes.push(tempArr.map(x => Number(x)));
+      this.problem.processingTimes.push(tempArr.map(x => Number(x)));
     }
     console.log(this.problem);
   }
 
   /**
    * Reads the problem file and returns as string.
-   * @param problemFileName File name of the selected problem
+   * @param problemFileName File name of the selected problem.
    */
   readProblem(problemFileName: string): Observable<string> {
     return this.http.get('../assets/problems/' + problemFileName, { responseType: 'text' }).pipe();
   }
 
-  /** Resets problem instance to default empty values */
+  /** Resets problem instance to default empty values. */
   resetProblem() {
-    this.problem.BoundUpper = undefined;
-    this.problem.BoundLower = undefined;
-    // this.problem.Name = ''; (name already changes on problem selection in home, if needed elsewhere create another method)
-    this.problem.NumberOfJobs = 0;
-    this.problem.NumberOfMachines = 0;
-    this.problem.ProcessingTimes = [];
+    this.problem.boundUpper = undefined;
+    this.problem.boundLower = undefined;
+    this.problem.numberOfJobs = 0;
+    this.problem.numberOfMachines = 0;
+    this.problem.processingTimes = [];
   }
 }
 
 
 export interface Problem {  // Refactor as Flowshop?
-  /** Lower bound of the makespans */
-  BoundLower: number;
-  /** Upper bound of the optimal makespans (best value E. Taillard's gotten) */
-  BoundUpper: number;
-  /** Problem name */
-  Name: string;
-  /** Number of jobs */
-  NumberOfJobs: number;
-  /** Number of machines */
-  NumberOfMachines: number;
-  /** Processing times of each job on each machine */
-  ProcessingTimes: any[];
+  /** Lower bound of the makespans. */
+  boundLower: number;
+  /** Upper bound of the optimal makespans (best value E. Taillard's gotten). */
+  boundUpper: number;
+  /** Problem name. */
+  name: string;
+  /** Number of jobs. */
+  numberOfJobs: number;
+  /** Number of machines. */
+  numberOfMachines: number;
+  /** Processing times of each job on each machine. */
+  processingTimes: any[];
 }

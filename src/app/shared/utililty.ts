@@ -1,10 +1,10 @@
-/** Commonly used utility functions */
+/** Commonly used utility functions. */
 export class Utility {
 
     /**
      * Adds zero padding to given number.
-     * @param num Number
-     * @param size Length of returning string
+     * @param num Number.
+     * @param size Length of returning string.
      */
     public static pad(num, size) {
         return ('000000000' + num).substr(-size);

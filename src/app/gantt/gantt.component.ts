@@ -45,9 +45,9 @@ export class GanttComponent implements OnInit {
    */
   drawGanttChart(solution: Solution) {
     this.clear();
-    this.setCanvasSize(solution.Jobs.length);
-    this.setCanvasCoordinates(solution.Jobs, solution.Makespan);
-    this.drawGuidelines(10, solution.Makespan);
+    this.setCanvasSize(solution.jobs.length);
+    this.setCanvasCoordinates(solution.jobs, solution.makespan);
+    this.drawGuidelines(10, solution.makespan);
     // job blocks are drawn through ngFor using jobBlocks
   }
 
@@ -134,15 +134,15 @@ export class GanttComponent implements OnInit {
       const row: JobBlock[] = [];
       for (let j = 0; j < jobs[0].length; j++) {
         const jobBlock: JobBlock = {
-          x: Math.round(jobs[m][j].Start * scaleIndex) + this.canvasPadding,
+          x: Math.round(jobs[m][j].start * scaleIndex) + this.canvasPadding,
           y: (this.jobBlockGap + this.jobBlockHeight) * (m + 1),
-          w: Math.round(jobs[m][j].ProcessTime * scaleIndex),
+          w: Math.round(jobs[m][j].processTime * scaleIndex),
           h: this.jobBlockHeight,
-          Color: colors[j],
-          Start: jobs[m][j].Start,
-          ProcessTime: jobs[m][j].ProcessTime,
-          End: jobs[m][j].End,
-          Name: jobs[m][j].Name,
+          color: colors[j],
+          start: jobs[m][j].start,
+          processTime: jobs[m][j].processTime,
+          end: jobs[m][j].end,
+          name: jobs[m][j].name,
         };
         row.push(jobBlock);
       }
@@ -228,7 +228,7 @@ export class GanttComponent implements OnInit {
   }
 }
 
-/** Job Detail dialog component */
+/** Job Detail dialog component. */
 @Component({
   selector: 'app-gantt-job-detail',
   templateUrl: 'job-detail.html',
@@ -252,5 +252,5 @@ interface JobBlock extends Job {
   /** Height of job block. */
   h: number;
   /** Color of block. */
-  Color: string;
+  color: string;
 }

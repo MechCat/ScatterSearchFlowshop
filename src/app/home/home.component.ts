@@ -10,10 +10,10 @@ import { GanttComponent } from '../gantt/gantt.component';
 })
 export class HomeComponent implements OnInit {
 
-  /** Reference to Gannt Chart component */
+  /** Reference to Gannt Chart component. */
   @ViewChild(GanttComponent) private gantt: GanttComponent;
 
-  /** List of problem names */
+  /** List of problem names. */
   problemList: string[] = [];
 
   sequence: number[] = [0, 1, 2];  // temporary***
@@ -30,11 +30,11 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  /** Parses data from the selected problem text file */
+  /** Parses data from the selected problem text file. */
   selectProblem() {
     this.ps.resetProblem();
-    console.log('Selected problem:', this.ps.problem.Name);
-    this.ps.readProblem(this.ps.problem.Name).subscribe(x => {
+    console.log('Selected problem:', this.ps.problem.name);
+    this.ps.readProblem(this.ps.problem.name).subscribe(x => {
       console.log(x);
       this.ps.parseProblem(x);
     });
@@ -52,7 +52,7 @@ export class HomeComponent implements OnInit {
     // this.sequence = [1, 2, 0];
     this.seqLabel = this.sequence.toString();
     const solution = this.ps.evaluateSolution(this.sequence);
-    console.log('seq:', this.sequence, 'makespan: ', solution.Makespan);
+    console.log('seq:', this.sequence, 'makespan: ', solution.makespan);
     this.gantt.drawGanttChart(solution);
   }
 

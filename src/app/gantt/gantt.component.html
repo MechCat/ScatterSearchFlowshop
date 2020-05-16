@@ -7,9 +7,9 @@
         <g id='machines'>
             <g *ngFor="let machines of jobBlocks; let m = index">
                 <rect *ngFor="let job of machines; let j = index" class="job" (click)="openDialog(job, j, m)" [attr.x]="job.x"
-                    [attr.y]="job.y" [attr.width]="job.w" [attr.height]="job.h" [attr.fill]="job.Color" stroke="black"
+                    [attr.y]="job.y" [attr.width]="job.w" [attr.height]="job.h" [attr.fill]="job.color" stroke="black"
                     matTooltipPosition="above"
-                    matTooltip="M{{m}}, J{{job.Name}} (O:{{j}}) / P:{{job.ProcessTime}} / S:{{job.Start}} 🠊 E:{{job.End}}" />
+                    matTooltip="M{{m}}, J{{job.name}} (O:{{j}}) / P:{{job.processTime}} / S:{{job.start}} 🠊 E:{{job.end}}" />
             </g>
         </g>
         <defs>

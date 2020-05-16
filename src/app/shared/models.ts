@@ -1,27 +1,27 @@
-/** Essential individual job */
+/** Essential individual job. */
 export interface Job {
-    /** Time at the completion of job */
-    End: number;
-    /** Name or the index of job */
-    Name: any;
+    /** Time at the completion of job. */
+    end: number;
+    /** Name or the index of job. */
+    name: any;
     /** Processing time of job: the time needed to complete the job. */
-    ProcessTime: number;
-    /** Time at the start of job */
-    Start: number;
+    processTime: number;
+    /** Time at the start of job. */
+    start: number;
 }
 
-/** Flowshop problem solution */
+/** Flowshop problem solution. */
 export class Solution {
-    /** Total makespan of problem */
-    Makespan: number;
-    /** Solution sequence of jobs */
-    Sequence: number[];
-    /** Each machine x job proces in the solution */
-    Jobs: Job[][];
+    /** Total makespan of problem. */
+    makespan: number;
+    /** Solution sequence of jobs. */
+    sequence: number[];
+    /** Each machine x job proces in the solution. */
+    jobs: Job[][];
 
     constructor(sequence: number[]) {
-        this.Makespan = undefined;
-        this.Jobs = [];
-        this.Sequence = sequence;
+        this.makespan = undefined;
+        this.jobs = [];
+        this.sequence = sequence;
     }
 }
