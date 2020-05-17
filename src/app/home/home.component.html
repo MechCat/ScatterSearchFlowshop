@@ -7,20 +7,30 @@
                 {{p}}
             </mat-option>
         </mat-select>
-        <button mat-raised-button (click)="test()">TEST</button>
+        <!-- <button mat-raised-button (click)="test()">TEST</button> -->
+        <div class='summary'>
+            <div class='align-end'>Machines</div>
+            <div class='align-end'>Jobs</div>
+            <div class='align-end' matTooltip='Known lowerbound of makespan'>Cmax*</div>
+            <div>{{ps.problem.numberOfMachines}}</div>
+            <div>{{ps.problem.numberOfJobs}}</div>
+            <div>{{ps.problem.boundLower}}</div>
+        </div>
         <mat-form-field>
             <input matInput readonly [(value)]="seqLabel">
         </mat-form-field>
         <button mat-raised-button (click)="testRandomize()" [disabled]="!ps.problem.name">Randomize
             sequence</button>
     </div>
-    <!-- Canvas -->
+    <!-- Chart -->
     <app-gantt></app-gantt>
-    <!-- <div class="canvas-panel" [ngStyle]="{  'height': cs.canvasHeight +'px'}">
-        <canvas #layer2 class="canvas"></canvas>
-        <canvas #layer1 class="canvas"></canvas>
-    </div> -->
+    <!-- Output -->
     <div class="info">
         Output info
     </div>
+</div>
+
+<!-- Spinner -->
+<div *ngIf="wait" class="spinner-container">
+    <mat-spinner></mat-spinner>
 </div>
