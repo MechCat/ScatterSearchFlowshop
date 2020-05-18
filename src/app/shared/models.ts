@@ -25,3 +25,11 @@ export class Solution {
         this.sequence = sequence;
     }
 }
+
+/** Tree node for material tree. */
+export interface TreeNode {
+    /** Name of the node. */
+    name: string;
+    /** Children node. */
+    children?: TreeNode[];
+}

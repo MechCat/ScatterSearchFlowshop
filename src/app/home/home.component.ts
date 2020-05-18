@@ -2,6 +2,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProblemService } from '../core/problem.service';
 import { Utility } from '../shared/utililty';
 import { GanttComponent } from '../gantt/gantt.component';
+import { Solution, TreeNode } from '../shared/models';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { NestedTreeControl } from '@angular/cdk/tree';
+
 /** HomeComponent */
 @Component({
   selector: 'app-home',
@@ -13,14 +17,20 @@ export class HomeComponent implements OnInit {
   /** Reference to Gannt Chart component. */
   @ViewChild(GanttComponent) private gantt: GanttComponent;
 
+  /** Difference between the solution makespan and best-known makespan. */
+  makespanDif = { difference: 0, percent: 0 };
   /** List of problem names. */
   problemList: string[] = [];
+  /** Data source for the tree view of jobs. */
+  resultTreeData = new MatTreeNestedDataSource<TreeNode>();
+  /** Solution of the problem. */
+  solution: Solution = new Solution([]);
+  /** Tree controller. */
+  treeControl = new NestedTreeControl<TreeNode>(node => node.children);
   /** Disables UI and pops a spinner when **true.** */
   wait = false;
 
-  sequence: number[] = [0, 1, 2];  // temporary***
   seqLabel: any = '0, 1, 2';  // temp***
-
 
   constructor(public ps: ProblemService) { }
 
@@ -32,9 +42,35 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  /**
+   * Fills resultTreeData for tree view of jobs.
+   * @param solution Solution of problem.
+   */
+  fillTreeData(solution: Solution) {
+    const a: TreeNode[] = [];
+    for (let m = 0; m < solution.jobs.length; m++) {
+      const b: TreeNode = { name: 'M' + Utility.pad(m, 4), children: solution.jobs[m] };
+      a.push(b);
+    }
+    this.resultTreeData.data = a;
+  }
+
+  /** Checks if children exists under a tree node. */
+  hasChild = (_: number, node: TreeNode) => !!node.children && node.children.length > 0;
+
+  /** Clears solution and related variables to initial state. */
+  resetSolution() {
+    this.gantt.canvasHeight = 0;
+    this.gantt.clear();
+    this.solution = new Solution([]);
+    this.resultTreeData.data = [];
+    this.makespanDif = { difference: 0, percent: 0 };
+  }
+
   /** Parses data from the selected problem text file. */
   selectProblem() {
     this.wait = true;
+    this.resetSolution();
     this.ps.resetProblem();
     console.log('Selected problem:', this.ps.problem.name);
     this.ps.readProblem(this.ps.problem.name).subscribe(x => {
@@ -53,15 +89,19 @@ export class HomeComponent implements OnInit {
   /** Randomizes test solution sequence */
   testRandomize() {
     this.wait = true;
-    this.sequence = [];
+    const sequence = [];
     for (let i = 0; i < this.ps.problem.numberOfJobs; i++) {
-      this.sequence.push(i);
+      sequence.push(i);
     }
-    this.sequence = Utility.shuffle(this.sequence);
-    this.seqLabel = this.sequence.toString();
-    const solution = this.ps.evaluateSolution(this.sequence);
-    console.log('seq:', this.sequence, 'makespan: ', solution.makespan);
-    this.gantt.drawGanttChart(solution);
+    this.solution = new Solution(sequence);
+    this.solution.sequence = Utility.shuffle(this.solution.sequence);
+    this.seqLabel = this.solution.sequence.toString();
+    this.solution = this.ps.evaluateSolution(this.solution.sequence);
+    console.log('seq:', this.solution.sequence, 'makespan: ', this.solution.makespan);
+    this.makespanDif.difference = this.ps.problem.boundLower - this.solution.makespan;
+    this.makespanDif.percent = Math.round((this.makespanDif.difference * 100 / this.ps.problem.boundLower) * 100) / 100;
+    this.gantt.drawGanttChart(this.solution);
+    this.fillTreeData(this.solution);
     this.wait = false;
   }
 

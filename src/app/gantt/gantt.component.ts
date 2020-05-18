@@ -14,7 +14,7 @@ export class GanttComponent implements OnInit {
   /** Canvas coordinates, corresponding to Jobs. */
   jobBlocks: JobBlock[][] = [];
   /** Canvas height. */
-  canvasHeight = 320;
+  canvasHeight = 0;
   /** To confine all coordinates in drawable area. */
   canvasPadding = 50;
   /** Canvas width. */
