@@ -148,8 +148,8 @@ export class GanttComponent implements OnInit {
       }
       this.jobBlocks.push(row);
     }
-    console.log('drawing scaleIndex', scaleIndex);
-    console.log('jobBlocks', this.jobBlocks);
+    // console.log('drawing scaleIndex', scaleIndex);
+    // console.log('jobBlocks', this.jobBlocks);
   }
 
   /**

@@ -22,9 +22,9 @@ export class ProblemService {
   constructor(private http: HttpClient) { }
 
   /**
-   * Calculates solution makespan.
+   * Evaluates and nominalizes the sequence.
    * @param sequence Solution sequence of jobs.
-   * @return Makespan of given solution.
+   * @return Solution of the sequence (makespan, start/end times of each job on each machine).
    */
   evaluateSolution(sequence: number[]): Solution {
     const sol = new Solution(sequence);
@@ -59,8 +59,44 @@ export class ProblemService {
       sol.jobs.push(jobsOfCurrentMachine);
     }
     sol.makespan = sol.jobs[this.problem.numberOfMachines - 1][this.problem.numberOfJobs - 1].end;
-    console.log('solution:', sol);
     return sol;
+  }
+
+  /**
+   * Calculates the makespan of given sequence.
+   * @param sequence Sequence of jobs (can be partial or full).
+   * @return Makespan of the sequence.
+   */
+  evaluatePartialSequence(sequence: number[]): number {
+    const ends: number[][] = [];
+    for (let i = 0; i < this.problem.numberOfMachines; i++) {
+      const endsOnCurrentMachine: number[] = [];
+
+      if (i === 0) {  // 1st machine
+        let jobStart = 0;
+        for (let j = 0; j < sequence.length; j++) {
+          const jobEnd = jobStart + this.problem.processingTimes[0][sequence[j]]; // prep. & cleaning times here if needed
+          endsOnCurrentMachine.push(jobEnd);
+          jobStart = jobEnd;
+        }
+      } else { // other machines
+        for (let j = 0; j < sequence.length; j++) {
+          let jobStart;
+          const endOfPrevMachine = ends[i - 1][j];
+          const endOfPrevJob = (endsOnCurrentMachine[j - 1] !== undefined) ? endsOnCurrentMachine[j - 1] : 0;
+
+          if (endOfPrevJob > endOfPrevMachine)
+            jobStart = endOfPrevJob;
+          else
+            jobStart = endOfPrevMachine;
+
+          const jobEnd = jobStart + this.problem.processingTimes[i][sequence[j]];  // prep. & cleaning times here if needed
+          endsOnCurrentMachine.push(jobEnd);
+        }
+      }
+      ends.push(endsOnCurrentMachine);
+    }
+    return ends[this.problem.numberOfMachines - 1][sequence.length - 1];
   }
 
   /** Reads the problem names listed in assets...problems.json . */
