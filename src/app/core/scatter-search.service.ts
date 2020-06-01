@@ -37,11 +37,11 @@ export class ScatterSearchService {
 
   // Scatter search algorithm PARAMETERS
   /** Population size: number of solutions (pops) in the algorithm. */
-  public popSize = 10;  // 45*** correct after test
+  public popSize = 50;
   /** Iteration Limit: how many times the algorithm should repeat itself. */
-  public iterLimit = 3;  // 20***
+  public iterLimit = 20;
   /** Reference size: number of good and diverse(eg. bad) selected to proceed into combination method.  */
-  public refSize = { good: 2, diverse: 2 }; // refsetpropa dahil et******  // 7,3
+  public refSize = { good: 7, diverse: 3 };
 
   // Service variables
   /** Population of solutions. Each pop has a makespan and a job sequence. */

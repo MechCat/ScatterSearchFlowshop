@@ -1,26 +1,39 @@
 <div class="component-container">
     <!-- Controls -->
     <div class="control-panel">
-        <mat-select [(value)]="ps.problem.name" (selectionChange)="selectProblem()" placeholder="Problemler"
-            class="problem-selector">
-            <mat-option *ngFor="let p of problemList" [value]="p">
-                {{p}}
-            </mat-option>
-        </mat-select>
-        <!-- <button mat-raised-button (click)="test()">TEST</button> -->
-        <div class='summary'>
-            <div class='align-end'>Machines</div>
-            <div class='align-end'>Jobs</div>
-            <div class='align-end' matTooltip='Known lowerbound of makespan'>Cmax*</div>
-            <div>{{ps.problem.numberOfMachines}}</div>
-            <div>{{ps.problem.numberOfJobs}}</div>
-            <div>{{ps.problem.boundLower}}</div>
+        <div class="cp-problem">
+            <mat-form-field class="problem-select">
+                <mat-select [(value)]="ps.problem.name" (selectionChange)="selectProblem()" placeholder="Problemler">
+                    <mat-option *ngFor="let p of problemList" [value]="p">
+                        {{p}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class='summary'>
+                <div class='align-end'>Machines: {{ps.problem.numberOfMachines}}</div>
+                <div class='align-end'>Jobs: {{ps.problem.numberOfJobs}}</div>
+                <div class='align-end' matTooltip='Known lowerbound of makespan'>Cmax* : {{ps.problem.boundLower}}</div>
+            </div>
         </div>
-        <mat-form-field>
-            <input matInput readonly [(value)]="seqLabel">
-        </mat-form-field>
-        <button mat-raised-button (click)="testRandomize()" [disabled]="!ps.problem.name">Randomize
-            sequence</button>
+        <div class="cp-params">
+            <mat-form-field>
+                <mat-label>Population Size</mat-label>
+                <input matInput [(ngModel)]="sss.popSize" placeholder="5 ... 500" type="number" min="5" max="500">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Iteration Limit</mat-label>
+                <input matInput [(ngModel)]="sss.iterLimit" placeholder="1 ... 10000" type="number" min="1" max="10000">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Good Reference Size</mat-label>
+                <input matInput [(ngModel)]="sss.refSize.good" type="number" min="0">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Diverse Reference Size</mat-label>
+                <input matInput [(ngModel)]="sss.refSize.diverse" type="number" min="0">
+            </mat-form-field>
+            <button mat-raised-button (click)="scatterSearch()" [disabled]="!ps.problem.name || wait">START</button>
+        </div>
     </div>
     <!-- Chart -->
     <app-gantt></app-gantt>
@@ -57,7 +70,7 @@
                         <div class="tree-node" [class.tree-invisible]="!treeControl.isExpanded(node)">
                             <div></div>
                             <span>Process Time</span>
-                            <span>Start</span>
+                            <span>Search</span>
                             <span>End</span>
                         </div>
                     </div>

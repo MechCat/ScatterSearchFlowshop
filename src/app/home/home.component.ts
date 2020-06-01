@@ -5,6 +5,7 @@ import { GanttComponent } from '../gantt/gantt.component';
 import { Solution, TreeNode } from '../shared/models';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { NestedTreeControl } from '@angular/cdk/tree';
+import { ScatterSearchService } from '../core/scatter-search.service';
 
 /** HomeComponent */
 @Component({
@@ -30,9 +31,7 @@ export class HomeComponent implements OnInit {
   /** Disables UI and pops a spinner when **true.** */
   wait = false;
 
-  seqLabel: any = '0, 1, 2';  // temp***
-
-  constructor(public ps: ProblemService) { }
+  constructor(public ps: ProblemService, public sss: ScatterSearchService) { }
 
   /** ngOnInit */
   ngOnInit() {
@@ -67,6 +66,17 @@ export class HomeComponent implements OnInit {
     this.makespanDif = { difference: 0, percent: 0 };
   }
 
+  /** Runs the Scatter Search algorithm via *sss* service. */
+  scatterSearch() {
+    this.wait = true;
+    this.solution = this.sss.scatterSearch(this.ps);
+    this.makespanDif.difference = this.ps.problem.boundLower - this.solution.makespan;
+    this.makespanDif.percent = Math.round((this.makespanDif.difference * 100 / this.ps.problem.boundLower) * 100) / 100;
+    this.gantt.drawGanttChart(this.solution);
+    this.fillTreeData(this.solution);
+    this.wait = false;
+  }
+
   /** Parses data from the selected problem text file. */
   selectProblem() {
     this.wait = true;
@@ -78,31 +88,6 @@ export class HomeComponent implements OnInit {
       this.ps.parseProblem(x);
       this.wait = false;
     });
-  }
-
-
-  /** General testing function */
-  test() {
-    console.log('func test');
-  }
-
-  /** Randomizes test solution sequence */
-  testRandomize() {
-    this.wait = true;
-    const sequence = [];
-    for (let i = 0; i < this.ps.problem.numberOfJobs; i++) {
-      sequence.push(i);
-    }
-    this.solution = new Solution(sequence);
-    this.solution.sequence = Utility.shuffle(this.solution.sequence);
-    this.seqLabel = this.solution.sequence.toString();
-    this.solution = this.ps.evaluateSolution(this.solution.sequence);
-    console.log('seq:', this.solution.sequence, 'makespan: ', this.solution.makespan);
-    this.makespanDif.difference = this.ps.problem.boundLower - this.solution.makespan;
-    this.makespanDif.percent = Math.round((this.makespanDif.difference * 100 / this.ps.problem.boundLower) * 100) / 100;
-    this.gantt.drawGanttChart(this.solution);
-    this.fillTreeData(this.solution);
-    this.wait = false;
   }
 
 }
