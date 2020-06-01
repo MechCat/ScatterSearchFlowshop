@@ -23,7 +23,7 @@ export class Utility {
             arr[i] = arr[randomIndex];
             arr[randomIndex] = tempVal;
         }
-        return arr;
+        return [...arr];
     }
 
 }

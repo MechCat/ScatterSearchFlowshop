@@ -24,7 +24,7 @@ export class ProblemService {
   /**
    * Evaluates and nominalizes the sequence.
    * @param sequence Solution sequence of jobs.
-   * @return Solution of the sequence (makespan, start/end times of each job on each machine).
+   * @returns Solution of the sequence (makespan, start/end times of each job on each machine).
    */
   evaluateSolution(sequence: number[]): Solution {
     const sol = new Solution(sequence);
@@ -65,7 +65,7 @@ export class ProblemService {
   /**
    * Calculates the makespan of given sequence.
    * @param sequence Sequence of jobs (can be partial or full).
-   * @return Makespan of the sequence.
+   * @returns Makespan of the sequence.
    */
   evaluatePartialSequence(sequence: number[]): number {
     const ends: number[][] = [];
