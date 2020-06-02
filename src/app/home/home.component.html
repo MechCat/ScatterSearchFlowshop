@@ -101,13 +101,14 @@
 </div>
 
 <div *ngIf="showProblemData" class="spinner-container" (click)="showProblemData=false">
-    <div class="problem-div">
-        <mat-form-field class="problem-form" (click)="$event.stopPropagation()">
-            <mat-label>{{ps.problem.name}}</mat-label>
-            <textarea matInput type="text" readonly [(ngModel)]="problemContents" cdkTextareaAutosize></textarea>
-            <button mat-button matSuffix mat-icon-button (click)="showProblemData=false">
-                <mat-icon>close</mat-icon>
-            </button>
-        </mat-form-field>
-    </div>
+    <table>
+        <tr>
+            <th>{{ps.problem.name}}</th>
+            <th *ngFor="let job of ps.problem.processingTimes[0]; let j = index">J{{j}}</th>
+        </tr>
+        <tr *ngFor="let machs of ps.problem.processingTimes; let m = index">
+            <th>M{{m}}</th>
+            <td *ngFor="let job of machs">{{job}}</td>
+        </tr>
+    </table>
 </div>
