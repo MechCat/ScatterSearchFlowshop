@@ -30,6 +30,10 @@ export class HomeComponent implements OnInit {
   treeControl = new NestedTreeControl<TreeNode>(node => node.children);
   /** Disables UI and pops a spinner when **true.** */
   wait = false;
+  /** Shows contents of selected problem file. */
+  showProblemData = false;
+  /** Problem contents */
+  problemContents = 'Select a problem';
 
   constructor(public ps: ProblemService, public sss: ScatterSearchService) { }
 
@@ -85,6 +89,7 @@ export class HomeComponent implements OnInit {
     console.log('Selected problem:', this.ps.problem.name);
     this.ps.readProblem(this.ps.problem.name).subscribe(x => {
       console.log(x);
+      this.problemContents = x;
       this.ps.parseProblem(x);
       this.wait = false;
     });
