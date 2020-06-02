@@ -101,7 +101,7 @@ export class ProblemService {
 
   /** Reads the problem names listed in assets...problems.json . */
   getProblemNames() {
-    return this.http.get('assets/problems/problems.json');
+    return this.http.get('./assets/problems/problems.json');
   }
 
   /**
@@ -140,7 +140,7 @@ export class ProblemService {
    * @param problemFileName File name of the selected problem.
    */
   readProblem(problemFileName: string): Observable<string> {
-    return this.http.get('../assets/problems/' + problemFileName, { responseType: 'text' }).pipe();
+    return this.http.get('./assets/problems/' + problemFileName, { responseType: 'text' }).pipe();
   }
 
   /** Resets problem instance to default empty values. */
