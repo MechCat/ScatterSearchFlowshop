@@ -70,13 +70,19 @@ export class HomeComponent implements OnInit {
 
   /** Runs the Scatter Search algorithm via *sss* service. */
   scatterSearch() {
-    this.wait = true;
-    this.solution = this.sss.scatterSearch(this.ps);
-    this.makespanDif.difference = this.ps.problem.boundLower - this.solution.makespan;
-    this.makespanDif.percent = Math.round((this.makespanDif.difference * 100 / this.ps.problem.boundLower) * 100) / 100;
-    this.gantt.drawGanttChart(this.solution);
-    this.fillTreeData(this.solution);
-    this.wait = false;
+    let a = [1, 2, 3, 5, 4];
+    for (let i = 0; i < a.length; i++) {
+      a[i] = a[i] - 1;
+    }
+    console.log(' partial ', a, this.ps.evaluatePartialSequence(a));
+
+    // this.wait = true;
+    // this.solution = this.sss.scatterSearch(this.ps);
+    // this.makespanDif.difference = this.ps.problem.boundLower - this.solution.makespan;
+    // this.makespanDif.percent = Math.round((this.makespanDif.difference * 100 / this.ps.problem.boundLower) * 100) / 100;
+    // this.gantt.drawGanttChart(this.solution);
+    // this.fillTreeData(this.solution);
+    // this.wait = false;
   }
 
   /** Parses data from the selected problem text file. */
