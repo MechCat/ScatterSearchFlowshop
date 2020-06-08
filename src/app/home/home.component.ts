@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit {
   @ViewChild(GanttComponent) private gantt: GanttComponent;
 
   /** Difference between the solution makespan and best-known makespan. */
-  makespanDif = { difference: 0, percent: 0 };
+  makespanDif = { lbDifference: 0, lbPercent: 0, ubDifference: 0, ubPercent: 0 };
   /** List of problem names. */
   problemList: string[] = [];
   /** Data source for the tree view of jobs. */
@@ -65,24 +65,20 @@ export class HomeComponent implements OnInit {
     this.gantt.clear();
     this.solution = new Solution([]);
     this.resultTreeData.data = [];
-    this.makespanDif = { difference: 0, percent: 0 };
+    this.makespanDif = { lbDifference: 0, lbPercent: 0, ubDifference: 0, ubPercent: 0 };
   }
 
   /** Runs the Scatter Search algorithm via *sss* service. */
   scatterSearch() {
-    let a = [1, 2, 3, 5, 4];
-    for (let i = 0; i < a.length; i++) {
-      a[i] = a[i] - 1;
-    }
-    console.log(' partial ', a, this.ps.evaluatePartialSequence(a));
-
-    // this.wait = true;
-    // this.solution = this.sss.scatterSearch(this.ps);
-    // this.makespanDif.difference = this.ps.problem.boundLower - this.solution.makespan;
-    // this.makespanDif.percent = Math.round((this.makespanDif.difference * 100 / this.ps.problem.boundLower) * 100) / 100;
-    // this.gantt.drawGanttChart(this.solution);
-    // this.fillTreeData(this.solution);
-    // this.wait = false;
+    this.wait = true;
+    this.solution = this.sss.scatterSearch(this.ps);
+    this.makespanDif.lbDifference = this.ps.problem.boundLower - this.solution.makespan;
+    this.makespanDif.lbPercent = Math.round((this.makespanDif.lbDifference * 100 / this.ps.problem.boundLower) * 100) / 100;
+    this.makespanDif.ubDifference = this.ps.problem.boundUpper - this.solution.makespan;
+    this.makespanDif.ubPercent = Math.round((this.makespanDif.ubDifference * 100 / this.ps.problem.boundUpper) * 100) / 100;
+    this.gantt.drawGanttChart(this.solution);
+    this.fillTreeData(this.solution);
+    this.wait = false;
   }
 
   /** Parses data from the selected problem text file. */

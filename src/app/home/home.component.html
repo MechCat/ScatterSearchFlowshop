@@ -45,9 +45,17 @@
             <div>{{solution.makespan}}</div>
             <b>Lowerbound:</b>
             <div>{{ps.problem.boundLower}}</div>
-            <b>Change:</b>
-            <div [ngStyle]="{'color': makespanDif.difference >= 0 ? 'limegreen' : 'red'}">
-                {{makespanDif.difference}} &nbsp;&nbsp; ({{makespanDif.percent}}%)
+            <b>Lb Change:</b>
+            <div [ngStyle]="{'color': makespanDif.lbDifference >= 0 ? 'limegreen' : 'red'}">
+                {{makespanDif.lbDifference}} &nbsp;&nbsp; ({{makespanDif.lbPercent}}%)
+            </div>
+            <div></div>
+            <div></div>
+            <b>Upperbound:</b>
+            <div>{{ps.problem.boundUpper}}</div>
+            <b>Ub Change:</b>
+            <div [ngStyle]="{'color': makespanDif.ubDifference >= 0 ? 'limegreen' : 'red'}">
+                {{makespanDif.ubDifference}} &nbsp;&nbsp; ({{makespanDif.ubPercent}}%)
             </div>
         </div>
         <!-- Sequence -->

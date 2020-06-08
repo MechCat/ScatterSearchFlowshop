@@ -70,7 +70,6 @@ export class ScatterSearchService {
       this.improve();
     }
     this.pops.sort((a, b) => a.makespan - b.makespan);  // sort pops after last improvement
-    return this.ps.evaluateSolution([3, 4, 0, 1, 2]); // return the best
     return this.ps.evaluateSolution(this.pops[0].sequence); // return the best
   }
 
