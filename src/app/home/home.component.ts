@@ -71,6 +71,7 @@ export class HomeComponent implements OnInit {
   /** Runs the Scatter Search algorithm via *sss* service. */
   scatterSearch() {
     this.wait = true;
+    const startTime = Date.now();
     this.solution = this.sss.scatterSearch(this.ps);
     this.makespanDif.lbDifference = this.ps.problem.boundLower - this.solution.makespan;
     this.makespanDif.lbPercent = Math.round((this.makespanDif.lbDifference * 100 / this.ps.problem.boundLower) * 100) / 100;
@@ -78,6 +79,7 @@ export class HomeComponent implements OnInit {
     this.makespanDif.ubPercent = Math.round((this.makespanDif.ubDifference * 100 / this.ps.problem.boundUpper) * 100) / 100;
     this.gantt.drawGanttChart(this.solution);
     this.fillTreeData(this.solution);
+    console.log('runtime: ', Date.now() - startTime + 'ms');
     this.wait = false;
   }
 

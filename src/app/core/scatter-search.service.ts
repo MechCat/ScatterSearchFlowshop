@@ -103,6 +103,9 @@ export class ScatterSearchService {
     }
     this.nehAlgorithm();
     this.pops.push(this.nehSolution);
+    this.pops.push(this.palmersHeuristic());
+    console.log('pop len', this.pops.length);
+
     //#endregion
   }
 
@@ -148,6 +151,49 @@ export class ScatterSearchService {
     this.nehSolution.makespan = this.ps.evaluatePartialSequence(this.nehSolution.sequence);
     //#endregion
   }
+
+  private cds() { }
+
+  /**
+   * Palmer's (1965) version of the Johnson's rule to ‘m’ machine flow shop scheduling heuristics.
+   * The heuristic calculates a slope index for each job and then schedules the jobs in descending order of the slope index.
+   * @returns A Pop with sequence and makespan.
+   */
+  private palmersHeuristic(): Pop {
+    console.log('here we are at palmers door');
+    const palmerSol: Pop = { makespan: undefined, sequence: [] };
+    const slopeMatrix: number[][] = [];
+    const slopes = [];
+    // calc sub-slopes.
+    for (let m = 0; m < this.ps.problem.numberOfMachines; m++) {
+      let slope: number[] = [];
+      let coef = 0 - (this.ps.problem.numberOfMachines - (2 * (m + 1) - 1));
+      for (let j = 0; j < this.ps.problem.numberOfJobs; j++) {
+        slope.push(this.ps.problem.processingTimes[m][j] * coef);
+      }
+      slopeMatrix.push(slope);
+    }
+    // sum sub-slopes to get each slope for jobs.
+    for (let j = 0; j < this.ps.problem.numberOfJobs; j++) {
+      let slopeVal = 0;
+      for (let m = 0; m < this.ps.problem.numberOfMachines; m++) {
+        slopeVal += slopeMatrix[m][j];
+      }
+      let jobSlope = { value: slopeVal, index: j };
+      slopes.push(jobSlope);
+    }
+    slopes.sort((a, b) => b.value - a.value); // sort  in descending order.
+    // construct pop.
+    for (let i = 0; i < slopes.length; i++) {
+      palmerSol.sequence.push(slopes[i].index);
+    }
+    palmerSol.makespan = this.ps.evaluatePartialSequence(palmerSol.sequence);
+    // console.log('slopes final ', slopes);
+    console.log(palmerSol);
+    return palmerSol;
+  }
+
+  private spt() { }
 
   /**
    * Improves pops by swapping them with new ones provided by local search algorithm

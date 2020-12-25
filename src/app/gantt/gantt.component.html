@@ -9,7 +9,7 @@
                 <rect *ngFor="let job of machines; let j = index" class="job" (click)="openDialog(job, j, m)"
                     [attr.x]="job.x" [attr.y]="job.y" [attr.width]="job.w" [attr.height]="job.h" [attr.fill]="job.color"
                     stroke="black" matTooltipPosition="above"
-                    matTooltip="M{{m}}, J{{job.name}} (O:{{j}}) / P:{{job.processTime}} / S:{{job.start}} 🠊 E:{{job.end}}" />
+                    matTooltip="M{{m}}, J{{job.name}} (#{{j}}) / P:{{job.processTime}} / S:{{job.start}} 🠊 E:{{job.end}}" />
             </g>
         </g>
         <defs>
