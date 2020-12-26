@@ -104,8 +104,7 @@ export class ScatterSearchService {
     this.nehAlgorithm();
     this.pops.push(this.nehSolution);
     this.pops.push(this.palmersHeuristic());
-    console.log('pop len', this.pops.length);
-
+    this.pops.push(this.spt());
     //#endregion
   }
 
@@ -160,7 +159,6 @@ export class ScatterSearchService {
    * @returns A Pop with sequence and makespan.
    */
   private palmersHeuristic(): Pop {
-    console.log('here we are at palmers door');
     const palmerSol: Pop = { makespan: undefined, sequence: [] };
     const slopeMatrix: number[][] = [];
     const slopes = [];
@@ -184,16 +182,32 @@ export class ScatterSearchService {
     }
     slopes.sort((a, b) => b.value - a.value); // sort  in descending order.
     // construct pop.
-    for (let i = 0; i < slopes.length; i++) {
-      palmerSol.sequence.push(slopes[i].index);
-    }
+    palmerSol.sequence = slopes.map(x => x.index);
     palmerSol.makespan = this.ps.evaluatePartialSequence(palmerSol.sequence);
     // console.log('slopes final ', slopes);
-    console.log(palmerSol);
+    console.log('palmerSol', palmerSol);
     return palmerSol;
   }
 
-  private spt() { }
+  /**
+   * Shortest processing time.
+   * Constructs sequence according to the total processing times on a machine in **increasing order**.
+   * @returns A Pop with sequence and makespan.
+   */
+  private spt(): Pop {
+    const sptSol: Pop = { makespan: undefined, sequence: [] };
+    const tjt = []; // total job times in spt context.
+    for (let j = 0; j < this.totalJobTimes.length; j++) {
+      let job = { pt: this.totalJobTimes[j], index: j };
+      tjt.push(job);
+    }
+    tjt.sort((a, b) => a.pt - b.pt);
+    sptSol.sequence = tjt.map(x => x.index);
+    sptSol.makespan = this.ps.evaluatePartialSequence(sptSol.sequence);
+    console.log('tjt', tjt);
+    console.log('sptsol', sptSol);
+    return sptSol;
+  }
 
   /**
    * Improves pops by swapping them with new ones provided by local search algorithm
