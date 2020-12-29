@@ -129,7 +129,7 @@ export class ProblemService {
     this.problem.boundLower = Number(tempProperties[4]);
 
     for (let i = 3; i < rows.length; i++) { // starting from the rows[3] where processing times are
-      const tempArr = rows[i].match(/[0-9]+/g);
+      const tempArr = rows[i].match(/[0-9.]+/g);
       this.problem.processingTimes.push(tempArr.map(x => Number(x)));
     }
     console.log(this.problem);
@@ -165,6 +165,6 @@ export interface Problem {  // Refactor as Flowshop?
   numberOfJobs: number;
   /** Number of machines. */
   numberOfMachines: number;
-  /** Processing times of each job on each machine. */
+  /** Processing times of each job on each machine. 2 layered array: [m][j]*/
   processingTimes: any[];
 }

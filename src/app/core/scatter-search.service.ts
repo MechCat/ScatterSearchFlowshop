@@ -105,6 +105,7 @@ export class ScatterSearchService {
     this.pops.push(this.nehSolution);
     this.pops.push(this.palmersHeuristic());
     this.pops.push(this.spt());
+    this.pops.push(this.cds());
     //#endregion
   }
 
@@ -151,7 +152,71 @@ export class ScatterSearchService {
     //#endregion
   }
 
-  private cds() { }
+  /**
+   * Campbell, Dudek, Smith algorithm. Applies Johnson's rule for m>2 problems using surrogate problem steps.
+   * https://www.researchgate.net/publication/336848617_Production_Time_Optimization_using_Campbell_Dudek_Smith_CDS_Algorithm_for_Production_Scheduling
+   * @returns The pop with the best sequence and makespan found by algorithm.
+   */
+  private cds(): Pop {
+    // #1 initialisation and 1st iteration (machine A: first & machine B: last).
+    const sols: Pop[] = [];
+    const ptm1: number[] = [...this.ps.problem.processingTimes[0]]; // first machine.
+    const ptm2: number[] = [...this.ps.problem.processingTimes[this.ps.problem.numberOfMachines - 1]];  // last machine.
+    sols.push(this.johnsonsRule(ptm1, ptm2));
+
+    // #2 iterate till m-1 while adding neighboring machines times to mach A and mach B.
+    for (let i = 0; i < this.ps.problem.numberOfMachines - 2; i++) {
+      for (let j = 0; j < this.ps.problem.numberOfJobs; j++) {
+        ptm1[j] += this.ps.problem.processingTimes[i + 1][j];
+        ptm2[j] += this.ps.problem.processingTimes[this.ps.problem.numberOfMachines - 2 - i][j];
+      }
+      sols.push(this.johnsonsRule(ptm1, ptm2)); // apply Johnson's rule to every new duo.
+    }
+    sols.sort((a, b) => a.makespan - b.makespan); // sort by quality.
+    return sols[0]; // return best solution.
+  }
+
+  /**
+   * Applies Johnson's rule to two given process time set. *(Used as a sub-function for CDS since most problems contain more than 2 machines)*
+   * @param ptm1 Process times of each job for 1st machine.
+   * @param ptm2 Process times of each job for 2nd machine.
+   * @returns A Pop with sequence and makespan.
+   */
+  private johnsonsRule(ptm1: number[], ptm2: number[]): Pop {
+    const sol: Pop = { makespan: undefined, sequence: [] };
+    const set1: number[] = [];
+    const set2: number[] = [];
+
+    for (let i = 0; i < ptm1.length; i++) {
+      ptm1[i] < ptm2[i] ? set1.push(i) : set2.push(i);
+      // if value's equal can be pushed into each set. Later check every variation?
+      // Although equal number coulb be limitless and increase variation number logaritmic.
+      // Solution proposal: if values're equal, flip a coin.
+    }
+
+    //#region order set1 using SPT
+    const seq1 = []; // total process time per machine
+    for (let i = 0; i < set1.length; i++) {
+      const t = { index: set1[i], pt: ptm1[set1[i]] + ptm2[set1[i]] }
+      seq1.push(t);
+    }
+    seq1.sort((a, b) => a.pt - b.pt);
+    //#endregion
+
+    //#region order set1 using LPT
+    const seq2 = []; // total process time per machine
+    for (let i = 0; i < set2.length; i++) {
+      const t = { index: set2[i], pt: ptm1[set2[i]] + ptm2[set2[i]] }
+      seq2.push(t);
+    }
+    seq2.sort((a, b) => b.pt - a.pt);
+    //#endregion
+
+    seq1.forEach(x => { sol.sequence.push(x.index); });
+    seq2.forEach(x => { sol.sequence.push(x.index); });
+    sol.makespan = this.ps.evaluatePartialSequence(sol.sequence);
+    return sol;
+  }
 
   /**
    * Palmer's (1965) version of the Johnson's rule to ‘m’ machine flow shop scheduling heuristics.
@@ -185,7 +250,7 @@ export class ScatterSearchService {
     palmerSol.sequence = slopes.map(x => x.index);
     palmerSol.makespan = this.ps.evaluatePartialSequence(palmerSol.sequence);
     // console.log('slopes final ', slopes);
-    console.log('palmerSol', palmerSol);
+    // console.log('palmerSol', palmerSol);
     return palmerSol;
   }
 
@@ -204,8 +269,8 @@ export class ScatterSearchService {
     tjt.sort((a, b) => a.pt - b.pt);
     sptSol.sequence = tjt.map(x => x.index);
     sptSol.makespan = this.ps.evaluatePartialSequence(sptSol.sequence);
-    console.log('tjt', tjt);
-    console.log('sptsol', sptSol);
+    // console.log('tjt', tjt);
+    // console.log('sptsol', sptSol);
     return sptSol;
   }
 
