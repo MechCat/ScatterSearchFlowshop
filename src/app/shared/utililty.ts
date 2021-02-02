@@ -2,6 +2,33 @@
 export class Utility {
 
     /**
+     * Creates and downloads a cvs file using provided rows.
+     * @param data Data rows in 2D (row x column).
+     * @param fileName Name of the file.
+     */
+    public static cvsOutput(data: string[][], fileName: string) {
+        // const data = [   // example data
+        //   ["name1", "price1", "stock1"],
+        //   ["name2", "price2", "stock2"]
+        // ];
+
+        const csvContent = 'data:text/csv;charset=utf-8,'
+            + data.map(e => e.join(';')).join('\n');
+        // (, => ;) https://en.wikipedia.org/wiki/Comma-separated_values#Example
+        // ip check can be implemented to set comma or semicolon using https://extreme-ip-lookup.com/json/
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', fileName + '.csv');
+        document.body.appendChild(link); // Required for FF
+
+        setTimeout(() => { link.remove(); }, 5000); // remove element
+
+        link.click(); // This will download the data file named "my_data.csv".
+    }
+
+    /**
      * Adds zero padding to given number.
      * @param num Number.
      * @param size Length of returning string.
