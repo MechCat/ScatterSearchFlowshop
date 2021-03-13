@@ -38,6 +38,16 @@ export class Utility {
     }
 
     /**
+     * Generates a random number between specified range. Params're inclusive.
+     * @param max Maximum eligible number.
+     * @param min Minimum eligible number (0 by default).
+     * @returns  a random number between specified range.
+     */
+    public static random(max: number, min: number = 0) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    /**
      * Shuffles the provided array.
      * @param arr Array to be shuffled.
      */

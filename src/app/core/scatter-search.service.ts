@@ -177,7 +177,8 @@ export class ScatterSearchService {
   }
 
   /**
-   * Applies Johnson's rule to two given process time set. *(Used as a sub-function for CDS since most problems contain more than 2 machines)*
+   * Applies Johnson's rule to two given process time set.
+   * *(Used as a sub-function for CDS since most problems contain more than 2 machines)*.
    * @param ptm1 Process times of each job for 1st machine.
    * @param ptm2 Process times of each job for 2nd machine.
    * @returns A Pop with sequence and makespan.
@@ -197,7 +198,7 @@ export class ScatterSearchService {
     //#region order set1 using SPT
     const seq1 = []; // total process time per machine
     for (let i = 0; i < set1.length; i++) {
-      const t = { index: set1[i], pt: ptm1[set1[i]] + ptm2[set1[i]] }
+      const t = { index: set1[i], pt: ptm1[set1[i]] + ptm2[set1[i]] };
       seq1.push(t);
     }
     seq1.sort((a, b) => a.pt - b.pt);
@@ -206,7 +207,7 @@ export class ScatterSearchService {
     //#region order set1 using LPT
     const seq2 = []; // total process time per machine
     for (let i = 0; i < set2.length; i++) {
-      const t = { index: set2[i], pt: ptm1[set2[i]] + ptm2[set2[i]] }
+      const t = { index: set2[i], pt: ptm1[set2[i]] + ptm2[set2[i]] };
       seq2.push(t);
     }
     seq2.sort((a, b) => b.pt - a.pt);
@@ -229,8 +230,8 @@ export class ScatterSearchService {
     const slopes = [];
     // calc sub-slopes.
     for (let m = 0; m < this.ps.problem.numberOfMachines; m++) {
-      let slope: number[] = [];
-      let coef = 0 - (this.ps.problem.numberOfMachines - (2 * (m + 1) - 1));
+      const slope: number[] = [];
+      const coef = 0 - (this.ps.problem.numberOfMachines - (2 * (m + 1) - 1));
       for (let j = 0; j < this.ps.problem.numberOfJobs; j++) {
         slope.push(this.ps.problem.processingTimes[m][j] * coef);
       }
@@ -242,7 +243,7 @@ export class ScatterSearchService {
       for (let m = 0; m < this.ps.problem.numberOfMachines; m++) {
         slopeVal += slopeMatrix[m][j];
       }
-      let jobSlope = { value: slopeVal, index: j };
+      const jobSlope = { value: slopeVal, index: j };
       slopes.push(jobSlope);
     }
     slopes.sort((a, b) => b.value - a.value); // sort  in descending order.
@@ -263,7 +264,7 @@ export class ScatterSearchService {
     const sptSol: Pop = { makespan: undefined, sequence: [] };
     const tjt = []; // total job times in spt context.
     for (let j = 0; j < this.totalJobTimes.length; j++) {
-      let job = { pt: this.totalJobTimes[j], index: j };
+      const job = { pt: this.totalJobTimes[j], index: j };
       tjt.push(job);
     }
     tjt.sort((a, b) => a.pt - b.pt);
