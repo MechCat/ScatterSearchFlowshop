@@ -14,7 +14,6 @@
 }
 
 .control-panel {
-    background-color: darkkhaki;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 50vw));
     justify-items: center;
@@ -51,11 +50,15 @@
     justify-items: center;
     align-items: center;
 
-    table { // problem detail styles
+    table {
+        // problem detail styles
         background-color: white;
         box-shadow: 0 0 20px rgba($color: #000000, $alpha: 0.5);
         border-collapse: collapse;
-        width: 100%;
+        // width: 100%;
+        max-width: 100%;
+        overflow-x: scroll;
+        display: block;
     }
 
     td,
@@ -68,6 +71,19 @@
     tr:nth-child(even) {
         background-color: #dddddd;
     }
+}
+
+.close-table-x {
+    background: indianred;
+    color: ghostwhite;
+    border-radius: 50%;
+    cursor: pointer;
+    position: fixed;
+    right: 2em;
+    height: 1.5em;
+    width: 1.5em;
+    text-align: center;
+    box-shadow: 0 0 1em 0 indianred;
 }
 
 .summary {
@@ -83,7 +99,7 @@
 }
 
 .result {
-    background-color: whitesmoke;
+    background-color: #f4f4fe;
     padding: 1rem 2rem;
 }
 
