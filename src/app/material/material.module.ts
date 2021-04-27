@@ -19,8 +19,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatProgressSpinnerModule,
     MatSelectModule,
     MatTreeModule,
-    MatTooltipModule,
-    MatIconModule
+    MatTooltipModule
+    , MatIconModule
   ],
   exports: [
     MatButtonModule,

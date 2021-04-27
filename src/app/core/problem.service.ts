@@ -165,6 +165,6 @@ export interface Problem {  // Refactor as Flowshop?
   numberOfJobs: number;
   /** Number of machines. */
   numberOfMachines: number;
-  /** Processing times of each job on each machine. 2 layered array: [m][j]. */
+  /** Processing times of each job on each machine. 2 layered array: [m][j]*/
   processingTimes: any[];
 }
