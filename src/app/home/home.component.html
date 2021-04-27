@@ -38,7 +38,7 @@
     <!-- Chart -->
     <app-gantt></app-gantt>
     <!-- Output -->
-    <div class="result">
+    <div class="result" *ngIf="solution.makespan">
         <!-- Makespan -->
         <div class="result-makespan">
             <b>Makespan:</b>
@@ -109,14 +109,13 @@
 </div>
 
 <div *ngIf="showProblemData" class="spinner-container" (click)="showProblemData=false">
-    <table>
-        <tr>
-            <th>{{ps.problem.name}}</th>
-            <th *ngFor="let job of ps.problem.processingTimes[0]; let j = index">J{{j}}</th>
-        </tr>
-        <tr *ngFor="let machs of ps.problem.processingTimes; let m = index">
-            <th>M{{m}}</th>
-            <td *ngFor="let job of machs">{{job}}</td>
-        </tr>
-    </table>
-</div>
+        <table (click)="$event.stopPropagation()">
+            <tr>
+                <th>{{ps.problem.name}} <span class="close-table-x" (click)="showProblemData=false">x</span></th>
+                <th *ngFor="let job of ps.problem.processingTimes[0]; let j = index">J{{j}}</th>
+            </tr>
+            <tr *ngFor="let machs of ps.problem.processingTimes; let m = index">
+                <th>M{{m}}</th>
+                <td *ngFor="let job of machs" matTooltip='M{{m}}' [matTooltipPosition]="'left'">{{job}}</td>
+            </tr>
+        </table>
