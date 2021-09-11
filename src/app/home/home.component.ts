@@ -33,6 +33,18 @@ export class HomeComponent implements OnInit {
   /** Shows contents of selected problem file. */
   showProblemData = false;
 
+
+  //#region Parameter testing configuration.
+  /** If true makes sample runs using below configuration. */
+  paramTestEnabled = false;
+  /** Number of test runs made. */
+  sampleLimit = 5;
+  /** If true randomizes all parameters. */
+  randomParamsEnabled = false;
+  /** If true saves a cvs file at the end, containing the output of the test runs made . */
+  exportCsv = false;
+  //#endregion
+
   constructor(public ps: ProblemService, public sss: ScatterSearchService) { }
 
   /** ngOnInit */
@@ -71,15 +83,41 @@ export class HomeComponent implements OnInit {
   /** Runs the Scatter Search algorithm via *sss* service. */
   scatterSearch() {
     this.wait = true;
-    const startTime = Date.now();
-    this.solution = this.sss.scatterSearch(this.ps);
+    let data: any = [[]];
+    if (this.paramTestEnabled) {
+      data = [['Makespan', 'Runtime (ms)', 'Max Iteration', 'PopSize', 'RefRatio', 'Good Ref Ratio', 'Diverse Ref Ratio',
+        'RefSize', 'Good Ref Size', 'Diverse Ref Size', 'Sequence']];
+    } else {
+      data = [['Makespan', 'Runtime (ms)', 'Sequence']];
+    }
+
+    if (!this.paramTestEnabled)
+      this.sampleLimit = 1;
+
+    for (let i = 0; i < this.sampleLimit; i++) {
+      // Assign params
+      if (this.randomParamsEnabled && this.paramTestEnabled)
+        this.randomizeParameters();
+
+      const startTime = Date.now();
+      // RUN algorithm
+      this.solution = this.sss.scatterSearch(this.ps);
+      // fin & push into data
+      const rt = Date.now() - startTime;
+      console.log('>>>>>> curIt:', i, 'makespan: ', this.solution.makespan, 'runtime: ', rt + ' ms');
+
+      data.push([this.solution.makespan, rt, this.solution.sequence]);
+    }
+    // visual stuff
     this.makespanDif.lbDifference = this.ps.problem.boundLower - this.solution.makespan;
     this.makespanDif.lbPercent = Math.round((this.makespanDif.lbDifference * 100 / this.ps.problem.boundLower) * 100) / 100;
     this.makespanDif.ubDifference = this.ps.problem.boundUpper - this.solution.makespan;
     this.makespanDif.ubPercent = Math.round((this.makespanDif.ubDifference * 100 / this.ps.problem.boundUpper) * 100) / 100;
     this.gantt.drawGanttChart(this.solution);
     this.fillTreeData(this.solution);
-    console.log('runtime: ', Date.now() - startTime + 'ms');
+    // output
+    if (this.exportCsv)
+      Utility.cvsOutput(data, this.ps.problem.name + ' results');
     this.wait = false;
   }
 
@@ -94,6 +132,24 @@ export class HomeComponent implements OnInit {
       this.ps.parseProblem(x);
       this.wait = false;
     });
+  }
+
+  /** Randomizes parameters within the limits. */
+  randomizeParameters() {
+    const iterLimit = Utility.random(60, 20);
+    const popSize = Utility.random(200, 20);
+    const refRatio = Utility.random(100, 1);
+    const goodRefRatio = Utility.random(100);
+    const badRefRatio = 100 - goodRefRatio;
+    const refSize = Math.round(popSize * refRatio / 100);
+    const goodRefSize = Math.round(refSize * goodRefRatio / 100);
+    const badRefSize = refSize - goodRefSize; // = Math.round(refSize * badRefRatio / 100);
+    console.log('params: iterLimit, popSize, refSize, goodRefSize, badRefSize:', iterLimit, popSize, refSize, goodRefSize, badRefSize);
+    // alg. diagnostics
+    this.sss.iterLimit = iterLimit;
+    this.sss.popSize = popSize;
+    this.sss.refSize.good = goodRefSize;
+    this.sss.refSize.diverse = badRefSize;
   }
 
 }

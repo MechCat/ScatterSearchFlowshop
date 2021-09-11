@@ -125,7 +125,10 @@ export class GanttComponent implements OnInit {
   setCanvasCoordinates(jobs: Job[][], makespan: number) {
     const colors = [];
     jobs[0].forEach(e => {
-      colors.push('hsl(' + Math.round(Math.random() * 90) * 4 + ', 50%,60%)'); // 90 colors
+      const h = Math.round(Math.random() * 90) * 4; // 0 - 360, 4 steps (90 base hue)
+      const s = Math.round(Math.random() * 9) * 5 + 30 + '%'; // 30 - 70, 5 steps
+      const l = Math.round(Math.random() * 9) * 5 + 30 + '%'; // 30 - 70, 5 steps
+      colors.push(`hsl( ${h}, ${s}, ${l})`);
     });
 
     const scaleIndex = (this.canvasWidth - 2 * this.canvasPadding) / makespan;
