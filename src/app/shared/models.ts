@@ -26,6 +26,20 @@ export class Solution {
     }
 }
 
+/** Base parameters for scatter search algorithm. */
+export interface SSParams {
+    /** Population size: number of solutions (pops) in the algorithm. */
+    popSize: number;
+    /** Iteration Limit: how many times the algorithm should repeat itself. */
+    iterLimit: number;
+    /** Reference size: number of good solutions selected to proceed into combination method.  */
+    goodRef: number;
+    /** Reference size: number of diverse(eg. bad) solutions selected to proceed into combination method.  */
+    diverseRef: number;
+    /** Label for mat-select */
+    label?: string;
+}
+
 /** Tree node for material tree. */
 export interface TreeNode {
     /** Name of the node. */

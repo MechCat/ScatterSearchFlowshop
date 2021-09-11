@@ -3,7 +3,7 @@
     <div class="control-panel">
         <div class="cp-problem">
             <mat-form-field class="problem-select">
-                <mat-select [(value)]="ps.problem.name" (selectionChange)="selectProblem()" placeholder="Problemler">
+                <mat-select [(value)]="ps.problem.name" (selectionChange)="selectProblem()" placeholder="Problems">
                     <mat-option *ngFor="let p of problemList" [value]="p">
                         {{p}}
                     </mat-option>
@@ -31,6 +31,13 @@
             <mat-form-field>
                 <mat-label>Diverse Reference Size</mat-label>
                 <input matInput [(ngModel)]="sss.refSize.diverse" type="number" min="0">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-select [(value)]="selectedPreset" (selectionChange)="selectPreset()" placeholder="Presets">
+                    <mat-option *ngFor="let p of presets" [value]="p">
+                        {{p.label}}
+                    </mat-option>
+                </mat-select>
             </mat-form-field>
             <button mat-raised-button (click)="scatterSearch()" [disabled]="!ps.problem.name || wait">START</button>
         </div>
@@ -109,13 +116,14 @@
 </div>
 
 <div *ngIf="showProblemData" class="spinner-container" (click)="showProblemData=false">
-        <table (click)="$event.stopPropagation()">
-            <tr>
-                <th>{{ps.problem.name}} <span class="close-table-x" (click)="showProblemData=false">x</span></th>
-                <th *ngFor="let job of ps.problem.processingTimes[0]; let j = index">J{{j}}</th>
-            </tr>
-            <tr *ngFor="let machs of ps.problem.processingTimes; let m = index">
-                <th>M{{m}}</th>
-                <td *ngFor="let job of machs" matTooltip='M{{m}}' [matTooltipPosition]="'left'">{{job}}</td>
-            </tr>
-        </table>
+    <table (click)="$event.stopPropagation()">
+        <tr>
+            <th>{{ps.problem.name}} <span class="close-table-x" (click)="showProblemData=false">x</span></th>
+            <th *ngFor="let job of ps.problem.processingTimes[0]; let j = index">J{{j}}</th>
+        </tr>
+        <tr *ngFor="let machs of ps.problem.processingTimes; let m = index">
+            <th>M{{m}}</th>
+            <td *ngFor="let job of machs" matTooltip='M{{m}}' [matTooltipPosition]="'left'">{{job}}</td>
+        </tr>
+    </table>
+</div>

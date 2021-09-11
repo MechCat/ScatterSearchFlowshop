@@ -40,7 +40,7 @@ export class ScatterSearchService {
   public popSize = 30; // Optimal value for minimising makespan is 150 but takes far too long on large problems.
   /** Iteration Limit: how many times the algorithm should repeat itself. */
   public iterLimit = 20;
-  /** Reference size: number of good and diverse(eg. bad) selected to proceed into combination method.  */
+  /** Reference size: number of good and diverse(eg. bad) solutions selected to proceed into combination method.  */
   public refSize = { good: 14, diverse: 7 }; // Optimal ref size: 70% (of which 70% good ref, 30% bad ref) (suited for 150: 105, 70, 35)
 
   // Service variables

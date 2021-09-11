@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProblemService } from '../core/problem.service';
 import { Utility } from '../shared/utililty';
 import { GanttComponent } from '../gantt/gantt.component';
-import { Solution, TreeNode } from '../shared/models';
+import { Solution, TreeNode, SSParams } from '../shared/models';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { ScatterSearchService } from '../core/scatter-search.service';
@@ -32,6 +32,13 @@ export class HomeComponent implements OnInit {
   wait = false;
   /** Shows contents of selected problem file. */
   showProblemData = false;
+  /** Parameters presets. */
+  presets: SSParams[] = [
+    { label: 'Quick Demo', popSize: 30, iterLimit: 20, goodRef: 14, diverseRef: 7 },
+    { label: 'Recommended Parameters', popSize: 150, iterLimit: 20, goodRef: 70, diverseRef: 35 }
+  ];
+  /** Currently selected parameters. */
+  selectedPreset: SSParams;
 
 
   //#region Parameter testing configuration.
@@ -53,6 +60,7 @@ export class HomeComponent implements OnInit {
       // tslint:disable-next-line: no-string-literal
       this.problemList = x['problems'];
     });
+    this.selectedPreset = this.presets[0];
   }
 
   /**
@@ -132,6 +140,14 @@ export class HomeComponent implements OnInit {
       this.ps.parseProblem(x);
       this.wait = false;
     });
+  }
+
+  /** Reassings algorithm parameters when preset changes. */
+  selectPreset() {
+    this.sss.iterLimit = this.selectedPreset.iterLimit;
+    this.sss.popSize = this.selectedPreset.popSize;
+    this.sss.refSize.good = this.selectedPreset.goodRef;
+    this.sss.refSize.diverse = this.selectedPreset.diverseRef;
   }
 
   /** Randomizes parameters within the limits. */
