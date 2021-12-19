@@ -35,6 +35,7 @@ export class HomeComponent implements OnInit {
   /** Parameters presets. */
   presets: SSParams[] = [
     { label: 'Quick Demo', popSize: 30, iterLimit: 20, goodRef: 14, diverseRef: 7 },
+    { label: 'Riahi\'s Parameters', popSize: 45, iterLimit: 13, goodRef: 7, diverseRef: 3 },
     { label: 'Recommended Parameters', popSize: 150, iterLimit: 20, goodRef: 70, diverseRef: 35 }
   ];
   /** Currently selected parameters. */
@@ -156,7 +157,7 @@ export class HomeComponent implements OnInit {
     const popSize = Utility.random(200, 20);
     const refRatio = Utility.random(100, 1);
     const goodRefRatio = Utility.random(100);
-    const badRefRatio = 100 - goodRefRatio;
+    // const badRefRatio = 100 - goodRefRatio;
     const refSize = Math.round(popSize * refRatio / 100);
     const goodRefSize = Math.round(refSize * goodRefRatio / 100);
     const badRefSize = refSize - goodRefSize; // = Math.round(refSize * badRefRatio / 100);
